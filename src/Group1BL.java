@@ -5,6 +5,7 @@
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import model.*;
@@ -55,7 +56,7 @@ public class Group1BL {
      * Core Requirement 2: Authenticate user login
      * Returns user information map if successful, null otherwise
      */
-    public Map<String, Object> authenticateUser(String username, String password) {
+    public User authenticateUser(String username, String password) {
         if (username == null || username.trim().isEmpty()) {
             System.err.println("Username cannot be empty");
             return null;
@@ -77,8 +78,9 @@ public class Group1BL {
         if (!validateUserInputs(username, password, fullName, email)) {
             return false;
         }
+        User user = new User(username, null, fullName, email, phone, "Student");
 
-        return dataLayer.addUser(username, password, fullName, email, phone, "Student");
+        return dataLayer.addUser(user, password);
     }
 
     /**
@@ -90,8 +92,9 @@ public class Group1BL {
         if (!validateUserInputs(username, password, fullName, email)) {
             return false;
         }
+        User user = new User(username, null, fullName, email, phone, "Admin");
 
-        return dataLayer.addUser(username, password, fullName, email, phone, "Admin");
+        return dataLayer.addUser(user, password);
     }
 
     /**
@@ -104,7 +107,9 @@ public class Group1BL {
             return false;
         }
 
-        return dataLayer.addUser(username, password, fullName, email, phone, "Driver");
+        User user = new User(username, null, fullName, email, phone, "Driver");
+
+        return dataLayer.addUser(user, password);
     }
 
     /**
@@ -160,7 +165,7 @@ public class Group1BL {
     /**
      * Core Requirement 9: View all available routes
      */
-    public ResultSet viewAvailableRoutes() {
+    public ArrayList<Route> viewAvailableRoutes() {
         return dataLayer.getAllRoutes();
     }
 
@@ -381,11 +386,7 @@ public class Group1BL {
         return report.toString();
     }
 
-    // ========== NEW METHODS USING MODEL OBJECTS ==========
-
-    /**
-     * Authenticate user and return User object
-     */
+   
     public User authenticateUserObject(String username, String password) {
         if (username == null || username.trim().isEmpty()) {
             System.err.println("Username cannot be empty");
@@ -396,15 +397,10 @@ public class Group1BL {
             return null;
         }
 
-        return dataLayer.loginUser(username, password);
+        return dataLayer.login(username, password);
     }
 
-    /**
-     * Get all routes as List of Route objects
-     */
-    public List<Route> getAvailableRoutes() {
-        return dataLayer.getAllRoutesAsList();
-    }
+
 
     /**
      * Get all users as List of User objects
@@ -462,42 +458,6 @@ public class Group1BL {
         return dataLayer.getDriverShuttleObject(driverId);
     }
 
-    /**
-     * Add a new user using User model object
-     */
-    public boolean addUser(User user, String password) {
-        // Validate inputs
-        if (!validateUserInputs(user.getUsername(), password, user.getFullName(), user.getEmail())) {
-            return false;
-        }
 
-        return dataLayer.addUser(user, password);
-    }
-
-    /**
-     * Create a new student
-     */
-    public boolean createStudent(String username, String password, String fullName, 
-                                 String email, String phone) {
-        User user = new User(username, null, fullName, email, phone, "Student");
-        return addUser(user, password);
-    }
-
-    /**
-     * Create a new admin
-     */
-    public boolean createAdmin(String username, String password, String fullName, 
-                               String email, String phone) {
-        User user = new User(username, null, fullName, email, phone, "Admin");
-        return addUser(user, password);
-    }
-
-    /**
-     * Create a new driver
-     */
-    public boolean createDriver(String username, String password, String fullName, 
-                               String email, String phone) {
-        User user = new User(username, null, fullName, email, phone, "Driver");
-        return addUser(user, password);
-    }
+    
 }

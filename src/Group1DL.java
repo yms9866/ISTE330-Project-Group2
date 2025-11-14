@@ -123,7 +123,7 @@ public class Group1DL {
      * Login a user and return User object if successful
      * Returns User object or null if login fails
      */
-    public User loginUser(String username, String password) {
+    public User login(String username, String password) {
         if (!isConnected) {
             System.err.println("Not connected to database");
             return null;
@@ -228,100 +228,97 @@ public class Group1DL {
         }
     }
 
-    /**
-     * Add a new user (legacy method for backward compatibility)
-     */
-    public boolean addUser(String username, String password, String fullName, 
-                          String email, String phone, String role) {
-        User user = new User(username, null, fullName, email, phone, role);
-        return addUser(user, password);
-    }
+    // public boolean addUser(String username, String password, String fullName, 
+    //                       String email, String phone, String role) {
+    //     User user = new User(username, null, fullName, email, phone, role);
+    //     return addUser(user, password);
+    // }
 
     /**
      * Legacy login method - kept for backward compatibility
      * Returns Map with keys: user_id, username, full_name, email, role
      */
-    public Map<String, Object> login(String username, String password) {
-        User user = loginUser(username, password);
-        if (user == null) {
-            return null;
-        }
+    // public Map<String, Object> login(String username, String password) {
+    //     User user = loginUser(username, password);
+    //     if (user == null) {
+    //         return null;
+    //     }
         
-        Map<String, Object> userInfo = new HashMap<>();
-        userInfo.put("user_id", user.getUserId());
-        userInfo.put("username", user.getUsername());
-        userInfo.put("full_name", user.getFullName());
-        userInfo.put("email", user.getEmail());
-        userInfo.put("role", user.getRole());
-        return userInfo;
-    }
+    //     Map<String, Object> userInfo = new HashMap<>();
+    //     userInfo.put("user_id", user.getUserId());
+    //     userInfo.put("username", user.getUsername());
+    //     userInfo.put("full_name", user.getFullName());
+    //     userInfo.put("email", user.getEmail());
+    //     userInfo.put("role", user.getRole());
+    //     return userInfo;
+    // }
 
     /**
      * Add a new user (Admin or Student) - old implementation
      */
-    private boolean addUserOld(String username, String password, String fullName, 
-                          String email, String phone, String role) {
-        if (!isConnected) {
-            System.err.println("Not connected to database");
-            return false;
-        }
+    // private boolean addUserOld(String username, String password, String fullName, 
+    //                       String email, String phone, String role) {
+    //     if (!isConnected) {
+    //         System.err.println("Not connected to database");
+    //         return false;
+    //     }
 
-        String hashedPassword = hashPassword(password);
-        if (hashedPassword == null) {
-            return false;
-        }
+    //     String hashedPassword = hashPassword(password);
+    //     if (hashedPassword == null) {
+    //         return false;
+    //     }
 
-        String insertUser = "INSERT INTO USERS (username, password_hash, full_name, email, phone, role) " +
-                           "VALUES (?, ?, ?, ?, ?, ?)";
+    //     String insertUser = "INSERT INTO USERS (username, password_hash, full_name, email, phone, role) " +
+    //                        "VALUES (?, ?, ?, ?, ?, ?)";
 
-        try {
-            connection.setAutoCommit(false);
+    //     try {
+    //         connection.setAutoCommit(false);
 
-            // Insert user
-            try (PreparedStatement pstmt = connection.prepareStatement(insertUser, 
-                    Statement.RETURN_GENERATED_KEYS)) {
-                pstmt.setString(1, username);
-                pstmt.setString(2, hashedPassword);
-                pstmt.setString(3, fullName);
-                pstmt.setString(4, email);
-                pstmt.setString(5, phone);
-                pstmt.setString(6, role);
+    //         // Insert user
+    //         try (PreparedStatement pstmt = connection.prepareStatement(insertUser, 
+    //                 Statement.RETURN_GENERATED_KEYS)) {
+    //             pstmt.setString(1, username);
+    //             pstmt.setString(2, hashedPassword);
+    //             pstmt.setString(3, fullName);
+    //             pstmt.setString(4, email);
+    //             pstmt.setString(5, phone);
+    //             pstmt.setString(6, role);
 
-                int affectedRows = pstmt.executeUpdate();
-                if (affectedRows == 0) {
-                    connection.rollback();
-                    return false;
-                }
+    //             int affectedRows = pstmt.executeUpdate();
+    //             if (affectedRows == 0) {
+    //                 connection.rollback();
+    //                 return false;
+    //             }
 
-                // If student, create account with initial balance
-                if (role.equals("Student")) {
-                    ResultSet generatedKeys = pstmt.getGeneratedKeys();
-                    if (generatedKeys.next()) {
-                        int userId = generatedKeys.getInt(1);
-                        String insertAccount = "INSERT INTO ACCOUNTS (user_id, balance) VALUES (?, 0.00)";
-                        try (PreparedStatement accStmt = connection.prepareStatement(insertAccount)) {
-                            accStmt.setInt(1, userId);
-                            accStmt.executeUpdate();
-                        }
-                    }
-                }
-            }
+    //             // If student, create account with initial balance
+    //             if (role.equals("Student")) {
+    //                 ResultSet generatedKeys = pstmt.getGeneratedKeys();
+    //                 if (generatedKeys.next()) {
+    //                     int userId = generatedKeys.getInt(1);
+    //                     String insertAccount = "INSERT INTO ACCOUNTS (user_id, balance) VALUES (?, 0.00)";
+    //                     try (PreparedStatement accStmt = connection.prepareStatement(insertAccount)) {
+    //                         accStmt.setInt(1, userId);
+    //                         accStmt.executeUpdate();
+    //                     }
+    //                 }
+    //             }
+    //         }
 
-            connection.commit();
-            connection.setAutoCommit(true);
-            return true;
+    //         connection.commit();
+    //         connection.setAutoCommit(true);
+    //         return true;
 
-        } catch (SQLException e) {
-            try {
-                connection.rollback();
-                connection.setAutoCommit(true);
-            } catch (SQLException ex) {
-                System.err.println("Rollback error: " + ex.getMessage());
-            }
-            System.err.println("Error adding user: " + e.getMessage());
-            return false;
-        }
-    }
+    //     } catch (SQLException e) {
+    //         try {
+    //             connection.rollback();
+    //             connection.setAutoCommit(true);
+    //         } catch (SQLException ex) {
+    //             System.err.println("Rollback error: " + ex.getMessage());
+    //         }
+    //         System.err.println("Error adding user: " + e.getMessage());
+    //         return false;
+    //     }
+    // }
 
     /**
      * Transfer credits between students using stored procedure
@@ -332,14 +329,17 @@ public class Group1DL {
         }
 
         String call = "{CALL sp_transfer_credits(?, ?, ?, ?)}";
-        try (CallableStatement cstmt = connection.prepareCall(call)) {
+        try {
+            CallableStatement cstmt = connection.prepareCall(call);
             cstmt.setInt(1, sourceUserId);
             cstmt.setInt(2, destUserId);
             cstmt.setDouble(3, amount);
             cstmt.registerOutParameter(4, Types.VARCHAR);
 
             cstmt.execute();
-            return cstmt.getString(4);
+            String result = cstmt.getString(4);
+            cstmt.close();
+            return result;
 
         } catch (SQLException e) {
             return "ERROR: " + e.getMessage();
@@ -391,7 +391,7 @@ public class Group1DL {
     /**
      * Get all active routes
      */
-    public ResultSet getAllRoutes() {
+    public ArrayList<Route> getAllRoutes() {
         if (!isConnected) {
             return null;
         }
@@ -401,7 +401,23 @@ public class Group1DL {
                        "FROM ROUTE WHERE is_active = TRUE ORDER BY route_name";
         try {
             Statement stmt = connection.createStatement();
-            return stmt.executeQuery(query);
+            ResultSet rs = stmt.executeQuery(query);
+            ArrayList<Route> routes = new ArrayList<>();
+            while (rs.next()) {
+                Route route = new Route(
+                    rs.getInt("route_id"),
+                    rs.getString("route_name"),
+                    rs.getString("route_code"),
+                    rs.getString("description"),
+                    rs.getBigDecimal("distance_km"),
+                    rs.getInt("estimated_duration_minutes"),
+                    rs.getBigDecimal("credits_required"), true, null
+                );
+                routes.add(route);
+            }
+            rs.close();
+            stmt.close();
+            return routes;
         } catch (SQLException e) {
             System.err.println("Error getting routes: " + e.getMessage());
             return null;
@@ -424,7 +440,11 @@ public class Group1DL {
         try {
             PreparedStatement pstmt = connection.prepareStatement(query);
             pstmt.setInt(1, studentId);
-            return pstmt.executeQuery();
+            ResultSet rs = pstmt.executeQuery();
+            rs.close();
+            pstmt.close();
+            return rs;
+          
         } catch (SQLException e) {
             System.err.println("Error getting student routes: " + e.getMessage());
             return null;

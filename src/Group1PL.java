@@ -11,11 +11,12 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
-import java.util.Map;
+import java.util.ArrayList;
+import model.*;
 
 public class Group1PL extends JFrame {
     private Group1BL businessLayer;
-    private Map<String, Object> currentUser;
+    private User currentUser;
     private int userId;
     private String userRole;
     
@@ -186,7 +187,7 @@ public class Group1PL extends JFrame {
         right.setBackground(PRIMARY);
         
         if (currentUser != null) {
-            JLabel user = new JLabel("Welcome, " + currentUser.get("full_name"));
+            JLabel user = new JLabel("Welcome, " + currentUser.getFullName());
             user.setForeground(Color.WHITE);
             right.add(user);
         }
@@ -572,12 +573,12 @@ public class Group1PL extends JFrame {
         refresh.addActionListener(e -> {
             model.setRowCount(0);
             try {
-                ResultSet rs = businessLayer.viewAvailableRoutes();
-                while (rs != null && rs.next()) {
+                ArrayList<Route> routes = businessLayer.viewAvailableRoutes();
+                for (Route route : routes) {
                     model.addRow(new Object[]{
-                        rs.getInt("route_id"), rs.getString("route_name"),
-                        rs.getString("route_code"), rs.getDouble("distance_km"),
-                        rs.getInt("estimated_duration_minutes"), rs.getDouble("credits_required")
+                        route.getRouteId(), route.getRouteName(),
+                        route.getRouteCode(), route.getDistanceKm(),
+                        route.getEstimatedDurationMinutes(), route.getCreditsRequired()
                     });
                 }
             } catch (Exception ex) {
@@ -737,8 +738,8 @@ public class Group1PL extends JFrame {
         currentUser = businessLayer.authenticateUser(username, password);
         
         if (currentUser != null) {
-            userId = (int) currentUser.get("user_id");
-            userRole = (String) currentUser.get("role");
+            userId = currentUser.getUserId();
+            userRole = currentUser.getRole();
             
             statusLabel.setText("Login successful!");
             statusLabel.setForeground(SUCCESS);
