@@ -1,3 +1,8 @@
+/*
+Group 2
+Members: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi
+Date: 11/19/2025
+*/
 package model;
 
 import java.math.BigDecimal;

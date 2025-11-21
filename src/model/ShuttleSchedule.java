@@ -1,3 +1,9 @@
+
+/*
+Group 2
+Members: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi
+Date: 11/18/2025
+*/
 package model;
 
 import java.sql.Time;
