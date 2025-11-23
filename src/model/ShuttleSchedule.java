@@ -2,7 +2,7 @@
 /*
 Group 2
 Members: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi
-Date: 11/18/2025
+Date: 11/23/2025
 */
 package model;
 
@@ -27,8 +27,8 @@ public class ShuttleSchedule {
     }
 
     // Constructor with all fields
-    public ShuttleSchedule(int scheduleId, int shuttleId, int routeId, String dayOfWeek, 
-                          Time departureTime, Time arrivalTime, boolean isActive) {
+    public ShuttleSchedule(int scheduleId, int shuttleId, int routeId, String dayOfWeek,
+            Time departureTime, Time arrivalTime, boolean isActive) {
         this.scheduleId = scheduleId;
         this.shuttleId = shuttleId;
         this.routeId = routeId;
@@ -39,8 +39,8 @@ public class ShuttleSchedule {
     }
 
     // Constructor without scheduleId (for new schedules)
-    public ShuttleSchedule(int shuttleId, int routeId, String dayOfWeek, 
-                          Time departureTime, Time arrivalTime) {
+    public ShuttleSchedule(int shuttleId, int routeId, String dayOfWeek,
+            Time departureTime, Time arrivalTime) {
         this.shuttleId = shuttleId;
         this.routeId = routeId;
         this.dayOfWeek = dayOfWeek;

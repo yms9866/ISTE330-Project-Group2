@@ -2,7 +2,7 @@
 /*
 Group 2
 Members: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi
-Date: 11/18/2025
+Date: 11/23/2025
 */
 package model;
 
@@ -29,8 +29,8 @@ public class User {
     }
 
     // Constructor with all fields
-    public User(int userId, String username, String passwordHash, String fullName, 
-                String email, String phone, String role, Timestamp createdAt, boolean isActive) {
+    public User(int userId, String username, String passwordHash, String fullName,
+            String email, String phone, String role, Timestamp createdAt, boolean isActive) {
         this.userId = userId;
         this.username = username;
         this.passwordHash = passwordHash;
@@ -43,8 +43,8 @@ public class User {
     }
 
     // Constructor without userId (for new users)
-    public User(String username, String passwordHash, String fullName, 
-                String email, String phone, String role) {
+    public User(String username, String passwordHash, String fullName,
+            String email, String phone, String role) {
         this.username = username;
         this.passwordHash = passwordHash;
         this.fullName = fullName;

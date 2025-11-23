@@ -1,20 +1,15 @@
 /*
 Group 2
 Members: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi
-Date: 11/17/2025
+Date: 11/23/2025
 */
 
 import java.sql.*;
-import java.awt.List;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import model.*;
 
-/**
- * Data Layer - Handles all database operations for the Shuttle Management
- * System
- */
 public class Group2DL {
     private Connection connection;
     private String dbUrl;
@@ -83,7 +78,7 @@ public class Group2DL {
             CallableStatement cstmt = connection.prepareCall(call);
             cstmt.setString(1, tableName);
             if (fullAccess) {
-                
+
                 return cstmt.executeQuery();
             } else {
                 return getUserSpecificData(tableName, userId);
@@ -93,6 +88,7 @@ public class Group2DL {
             return null;
         }
     }
+
     public static String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -153,7 +149,7 @@ public class Group2DL {
         }
 
         String query = "INSERT INTO USERS (username, password_hash, full_name, email, phone, role, is_active) " +
-                      "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             connection.setAutoCommit(false);
@@ -197,24 +193,23 @@ public class Group2DL {
             }
         }
     }
-    
 
     public ArrayList<Transaction> getUserTransactionHistory(int userId) {
         ArrayList<Transaction> transactions = new ArrayList<>();
-        
+
         if (!isConnected || userId <= 0) {
             return transactions;
         }
-        
+
         String query = "SELECT t.transaction_id, t.recieverid, t.senderid, t.amount, t.transaction_date" +
-                      " FROM TRANSACTIONS t " +
-                      "INNER JOIN USERS u ON t.senderid = u.user_id " +
-                      "WHERE u.user_id = ? " +
+                " FROM TRANSACTIONS t " +
+                "INNER JOIN USERS u ON t.senderid = u.user_id " +
+                "WHERE u.user_id = ? " +
                 "ORDER BY t.transaction_date DESC";
         try (PreparedStatement pstmt = connection.prepareStatement(query)) {
             pstmt.setInt(1, userId);
             ResultSet rs = pstmt.executeQuery();
-            
+
             while (rs.next()) {
                 Transaction transaction = new Transaction();
                 transaction.setTransactionId(rs.getInt("transaction_id"));
@@ -222,13 +217,13 @@ public class Group2DL {
                 transaction.setSenderid(rs.getInt("senderid"));
                 transaction.setAmount(rs.getDouble("amount"));
                 transaction.setTransactionDate(rs.getTimestamp("transaction_date"));
-                
+
                 transactions.add(transaction);
             }
         } catch (SQLException e) {
             System.err.println("Error retrieving transaction history: " + e.getMessage());
         }
-        
+
         return transactions;
     }
 
@@ -239,31 +234,32 @@ public class Group2DL {
         String call = "{CALL sp_transfer_credits(?, ?, ?, ?)}";
         try (CallableStatement cstmt = connection.prepareCall(call)) {
             connection.setAutoCommit(false);
-            
+
             // Execute the transfer
             cstmt.setInt(1, sourceUserId);
             cstmt.setInt(2, destUserId);
             cstmt.setDouble(3, amount);
             cstmt.registerOutParameter(4, Types.VARCHAR);
             cstmt.execute();
-            
+
             String result = cstmt.getString(4);
-            
+
             // If transfer was successful, record the transaction
             if (result.startsWith("SUCCESS")) {
                 try {
-                    
+
                     // Record the transaction
-                    String transactionSql = "INSERT INTO TRANSACTIONS (senderid, recieverid, amount, transaction_date) " +
-                                          "VALUES (?, ?, ?, NOW())";
-                                          
+                    String transactionSql = "INSERT INTO TRANSACTIONS (senderid, recieverid, amount, transaction_date) "
+                            +
+                            "VALUES (?, ?, ?, NOW())";
+
                     try (PreparedStatement pstmt = connection.prepareStatement(transactionSql)) {
-                        pstmt.setInt(1, sourceUserId);  
-                        pstmt.setInt(2, destUserId);   
+                        pstmt.setInt(1, sourceUserId);
+                        pstmt.setInt(2, destUserId);
                         pstmt.setDouble(3, amount);
                         pstmt.executeUpdate();
                     }
-                    
+
                     connection.commit();
                 } catch (SQLException e) {
                     connection.rollback();
@@ -272,7 +268,7 @@ public class Group2DL {
             } else {
                 connection.rollback();
             }
-            
+
             return result;
 
         } catch (SQLException e) {
@@ -291,8 +287,6 @@ public class Group2DL {
         }
     }
 
-    
-
     public double getAccountBalance(int userId) {
         if (!isConnected)
             return -1.0;
@@ -308,7 +302,6 @@ public class Group2DL {
         }
         return -1.0;
     }
-
 
     public ArrayList<Route> getAllRoutes() {
         ArrayList<Route> routes = new ArrayList<>();
@@ -602,7 +595,7 @@ public class Group2DL {
         }
         return null;
     }
-    
+
     public ResultSet getUserSpecificData(String tableName, int userId) {
         if (!isConnected) {
             return null;
@@ -622,7 +615,7 @@ public class Group2DL {
             while (re0.next()) {
                 routIds.append(re0.getInt("route_id")).append(",");
             }
-            //  rmove last comma
+            // rmove last comma
             if (routIds.length() > 0) {
                 routIds.setLength(routIds.length() - 1);
             } else {
@@ -705,7 +698,7 @@ public class Group2DL {
         }
         return null;
     }
-    
+
     public User getUserById(int userId) {
         if (!isConnected)
             return null;

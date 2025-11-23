@@ -1,7 +1,7 @@
 /*
 Group 2
 Members: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi
-Date: 11/17/2025
+Date: 11/23/2025
 */
 
 import javax.swing.*;
@@ -89,13 +89,13 @@ public class Group2PL extends JFrame {
                 "<h2 style='padding: 10px; font-size: 24px; color: white;'>Shuttle Management System</h2>" +
                 "<p style='padding: 10px; font-size: 18px; color: white;'>Members: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi</p>"
                 +
-                "<p style='padding: 10px; font-size: 18px; color: white;'>Date: 11/17/2025</p>" +
+                "<p style='padding: 10px; font-size: 18px; color: white;'>Date: 11/23/2025</p>" +
                 "</div></html>");
 
         JButton continueButton = new JButton("Continue to Login");
         continueButton.addActionListener(e -> cardLayout.show(mainPanel, "LOGIN"));
         continueButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -180,7 +180,6 @@ public class Group2PL extends JFrame {
         c.gridwidth = 2;
         c.insets = new Insets(10, 10, 30, 10);
 
-    
         JLabel iconLabel = new JLabel("🚌");
         iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
         card.add(iconLabel, c);
@@ -241,13 +240,13 @@ public class Group2PL extends JFrame {
 
         fc.gridy++;
         fc.gridwidth = 2;
-        fc.fill = GridBagConstraints.HORIZONTAL; 
-        fc.weightx = 1.0; 
+        fc.fill = GridBagConstraints.HORIZONTAL;
+        fc.weightx = 1.0;
         usernameField = createModernTextField();
         formPanel.add(usernameField, fc);
 
         fc.gridy++;
-        fc.gridwidth = 1; 
+        fc.gridwidth = 1;
         JLabel passLabel = new JLabel("Password");
         passLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
         passLabel.setForeground(DARK);
@@ -255,8 +254,8 @@ public class Group2PL extends JFrame {
 
         fc.gridy++;
         fc.gridwidth = 2;
-        fc.fill = GridBagConstraints.HORIZONTAL; 
-        fc.weightx = 1.0; 
+        fc.fill = GridBagConstraints.HORIZONTAL;
+        fc.weightx = 1.0;
         passwordField = createModernPasswordField();
         formPanel.add(passwordField, fc);
 
@@ -373,7 +372,7 @@ public class Group2PL extends JFrame {
 
         JButton logout = new JButton("Logout");
         logout.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        
+
         logout.setPreferredSize(new Dimension(100, 40));
         logout.setForeground(Color.RED);
         logout.setBackground(new Color(255, 255, 255, 30));
@@ -414,7 +413,7 @@ public class Group2PL extends JFrame {
         JList<String> tableList = new JList<>(listModel);
         tableList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableList.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        tableList.setOpaque(false); 
+        tableList.setOpaque(false);
         tableList.setFixedCellHeight(45);
         tableList.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -490,7 +489,6 @@ public class Group2PL extends JFrame {
         rightTitle.setBorder(new EmptyBorder(0, 0, 15, 0));
         rightPanel.add(rightTitle, BorderLayout.NORTH);
 
-
         DefaultTableModel tableModel = new DefaultTableModel();
         JTable dataTable = new JTable(tableModel) {
             @Override
@@ -523,7 +521,6 @@ public class Group2PL extends JFrame {
         JButton refreshBtn = new JButton("Refresh");
         styleModernButton(refreshBtn, INFO);
 
-        
         JButton createBtn = new JButton("Create User");
         createBtn.setEnabled(false);
         createBtn.setVisible(false);
@@ -532,13 +529,13 @@ public class Group2PL extends JFrame {
         opsPanel.add(createBtn);
 
         rightPanel.add(opsPanel, BorderLayout.SOUTH);
-        
+
         tableList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tableList.getSelectedValue() != null) {
                 String tableName = tableList.getSelectedValue();
                 boolean isfullAcces = businessLayer.getUserById(currentUser.getUserId()).getRole()
                         .equalsIgnoreCase("Admin");
-                loadTableData(tableName, tableModel,isfullAcces, currentUser.getUserId());
+                loadTableData(tableName, tableModel, isfullAcces, currentUser.getUserId());
                 // Only enable create when USERS table is selected and current user is Admin
                 boolean isAdmin = userRole != null && userRole.equalsIgnoreCase("Admin");
                 createBtn.setEnabled(isAdmin && tableName.equalsIgnoreCase("USERS"));
@@ -551,7 +548,7 @@ public class Group2PL extends JFrame {
                 String tableName = tableList.getSelectedValue();
                 boolean isfullAcces = businessLayer.getUserById(currentUser.getUserId()).getRole()
                         .equalsIgnoreCase("Admin");
-                loadTableData(tableName, tableModel,isfullAcces, currentUser.getUserId());
+                loadTableData(tableName, tableModel, isfullAcces, currentUser.getUserId());
             }
         });
 
@@ -599,7 +596,8 @@ public class Group2PL extends JFrame {
             sb.append(String.format("Current Balance: %.2f credits\n\n", balance));
 
             try {
-                ArrayList<StudentRouteRegistration> registrations = businessLayer.getStudentRegistrations(currentUser.getUserId());
+                ArrayList<StudentRouteRegistration> registrations = businessLayer
+                        .getStudentRegistrations(currentUser.getUserId());
                 sb.append("REGISTERED ROUTES\n");
                 if (registrations.isEmpty()) {
                     sb.append("No routes registered yet.\n");
@@ -615,11 +613,11 @@ public class Group2PL extends JFrame {
                 }
             } catch (Exception ex) {
                 sb.append("\nError loading routes: ").append(ex.getMessage());
-            }   
+            }
 
             area.setText(sb.toString());
         });
-        
+
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottom.setBackground(Color.WHITE);
         bottom.setBorder(new EmptyBorder(15, 0, 0, 0));
@@ -629,12 +627,11 @@ public class Group2PL extends JFrame {
         contentPanel.add(new JScrollPane(area), BorderLayout.CENTER);
         panel.add(contentPanel, BorderLayout.CENTER);
 
-
         return panel;
     }
 
     private JPanel createTransferCreditsPanel() {
-        JPanel panel = new JPanel(new GridBagLayout()); 
+        JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(new EmptyBorder(40, 40, 40, 40));
         panel.setBackground(Color.WHITE);
 
@@ -762,7 +759,6 @@ public class Group2PL extends JFrame {
 
         contentPanel.add(new JScrollPane(table), BorderLayout.CENTER);
 
-   
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottom.setBackground(Color.WHITE);
         bottom.setBorder(new EmptyBorder(15, 0, 0, 0));
@@ -794,23 +790,23 @@ public class Group2PL extends JFrame {
 
         JButton loadButton = new JButton("Load Bookings");
         styleModernButton(loadButton, INFO);
-        loadButton.addActionListener(e -> { 
-                try {
-                    ArrayList<StudentRouteRegistration> registrations = businessLayer.getStudentRegistrations(userId);
-                    for (StudentRouteRegistration reg : registrations) {
-                        String statusIcon = reg.getStatus().equals("Active") ? "Active" : "Paused";
-                        model.addRow(new Object[] {
-                                businessLayer.getRouteNameById(reg.getRouteId()),
-                                businessLayer.getRouteCodeById(reg.getRouteId()),
-                                statusIcon + " " + reg.getStatus(),
-                                reg.getRegistrationDate()
-                        });
-                    }
-                } catch (Exception ex) {
-                    showError("Error loading bookings: " + ex.getMessage());
+        loadButton.addActionListener(e -> {
+            try {
+                ArrayList<StudentRouteRegistration> registrations = businessLayer.getStudentRegistrations(userId);
+                for (StudentRouteRegistration reg : registrations) {
+                    String statusIcon = reg.getStatus().equals("Active") ? "Active" : "Paused";
+                    model.addRow(new Object[] {
+                            businessLayer.getRouteNameById(reg.getRouteId()),
+                            businessLayer.getRouteCodeById(reg.getRouteId()),
+                            statusIcon + " " + reg.getStatus(),
+                            reg.getRegistrationDate()
+                    });
                 }
-            
-            });
+            } catch (Exception ex) {
+                showError("Error loading bookings: " + ex.getMessage());
+            }
+
+        });
         contentPanel.add(new JScrollPane(table), BorderLayout.CENTER);
         panel.add(contentPanel, BorderLayout.CENTER);
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -818,7 +814,6 @@ public class Group2PL extends JFrame {
         bottom.setBorder(new EmptyBorder(15, 0, 0, 0));
         bottom.add(loadButton);
         contentPanel.add(bottom, BorderLayout.SOUTH);
-
 
         return panel;
     }
@@ -843,21 +838,21 @@ public class Group2PL extends JFrame {
         JButton loadButton = new JButton("Load Schedule");
         styleModernButton(loadButton, INFO);
         loadButton.addActionListener(e -> {
-        try {
-            ArrayList<StudentRouteRegistration> registrations = businessLayer.getStudentRegistrations(userId);
-            for (StudentRouteRegistration reg : registrations) {
-                int routeId = reg.getRouteId();
-                ArrayList<ShuttleSchedule> schedules = businessLayer.getSchedulesForRoute(routeId);
-                for (ShuttleSchedule schedule : schedules) {
-                    model.addRow(new Object[] {
-                            businessLayer.getRouteNameById(routeId),
-                            schedule.getDayOfWeek(),
-                            schedule.getDepartureTime(),
-                            schedule.getArrivalTime(),
-                            businessLayer.getShuttleNumberById(schedule.getShuttleId())
-                    });
+            try {
+                ArrayList<StudentRouteRegistration> registrations = businessLayer.getStudentRegistrations(userId);
+                for (StudentRouteRegistration reg : registrations) {
+                    int routeId = reg.getRouteId();
+                    ArrayList<ShuttleSchedule> schedules = businessLayer.getSchedulesForRoute(routeId);
+                    for (ShuttleSchedule schedule : schedules) {
+                        model.addRow(new Object[] {
+                                businessLayer.getRouteNameById(routeId),
+                                schedule.getDayOfWeek(),
+                                schedule.getDepartureTime(),
+                                schedule.getArrivalTime(),
+                                businessLayer.getShuttleNumberById(schedule.getShuttleId())
+                        });
+                    }
                 }
-            }
             } catch (Exception ex) {
                 showError("Error loading schedule: " + ex.getMessage());
             }
@@ -880,7 +875,7 @@ public class Group2PL extends JFrame {
         panel.setBackground(Color.WHITE);
 
         DefaultTableModel model = new DefaultTableModel(
-                new String[] { "Date", "Receiver Name", "Sender Name", "Amount"}, 0) {
+                new String[] { "Date", "Receiver Name", "Sender Name", "Amount" }, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -896,7 +891,7 @@ public class Group2PL extends JFrame {
         styleModernButton(loadButton, INFO);
         loadButton.addActionListener(e -> {
             try {
-                model.setRowCount(0); 
+                model.setRowCount(0);
                 ArrayList<Transaction> transactions = businessLayer.getTransactionHistory(currentUser.getUserId());
                 System.out.println("Fetched " + transactions);
                 for (Transaction t : transactions) {
@@ -931,32 +926,34 @@ public class Group2PL extends JFrame {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Save Transaction Report");
         fileChooser.setSelectedFile(new File("transaction_report.csv"));
-        
+
         int userSelection = fileChooser.showSaveDialog(this);
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File fileToSave = fileChooser.getSelectedFile();
             if (!fileToSave.getName().toLowerCase().endsWith(".csv")) {
                 fileToSave = new File(fileToSave.getAbsolutePath() + ".csv");
             }
-            
+
             try (PrintWriter writer = new PrintWriter(fileToSave)) {
                 // Write header
                 for (int i = 0; i < model.getColumnCount(); i++) {
                     writer.write(model.getColumnName(i));
-                    if (i < model.getColumnCount() - 1) writer.write(",");
+                    if (i < model.getColumnCount() - 1)
+                        writer.write(",");
                 }
                 writer.write("\n");
-                
+
                 // Write data
                 for (int i = 0; i < model.getRowCount(); i++) {
                     for (int j = 0; j < model.getColumnCount(); j++) {
                         Object value = model.getValueAt(i, j);
                         writer.write(value != null ? value.toString() : "");
-                        if (j < model.getColumnCount() - 1) writer.write(",");
+                        if (j < model.getColumnCount() - 1)
+                            writer.write(",");
                     }
                     writer.write("\n");
                 }
-                
+
                 showSuccess("Transaction report downloaded successfully!");
             } catch (IOException ex) {
                 showError("Error saving file: " + ex.getMessage());
@@ -982,24 +979,24 @@ public class Group2PL extends JFrame {
         table.setRowHeight(35);
 
         // load button
-       JButton loadButton = new JButton("Load Locations");
-       styleModernButton(loadButton, INFO);
+        JButton loadButton = new JButton("Load Locations");
+        styleModernButton(loadButton, INFO);
         loadButton.addActionListener(e -> {
 
-        try {
-            ArrayList<ShuttleLocation> locations = businessLayer.getShuttleLocations();
-            for (ShuttleLocation loc : locations) {
-                model.addRow(new Object[] {
-                        businessLayer.getShuttleNumberById(loc.getShuttleId()),
-                        String.format("%.6f", loc.getLatitude()),
-                        String.format("%.6f", loc.getLongitude()),
-                        loc.getSpeedKmh() + " km/h",
-                        loc.getTimestamp()
-                });
+            try {
+                ArrayList<ShuttleLocation> locations = businessLayer.getShuttleLocations();
+                for (ShuttleLocation loc : locations) {
+                    model.addRow(new Object[] {
+                            businessLayer.getShuttleNumberById(loc.getShuttleId()),
+                            String.format("%.6f", loc.getLatitude()),
+                            String.format("%.6f", loc.getLongitude()),
+                            loc.getSpeedKmh() + " km/h",
+                            loc.getTimestamp()
+                    });
+                }
+            } catch (Exception ex) {
+                showError("Error loading shuttle locations: " + ex.getMessage());
             }
-        } catch (Exception ex) {
-            showError("Error loading shuttle locations: " + ex.getMessage());
-        }
         });
 
         contentPanel.add(new JScrollPane(table), BorderLayout.CENTER);
@@ -1009,7 +1006,6 @@ public class Group2PL extends JFrame {
         bottom.setBorder(new EmptyBorder(15, 0, 0, 0));
         bottom.add(loadButton);
         contentPanel.add(bottom, BorderLayout.SOUTH);
-        
 
         return panel;
     }
@@ -1227,8 +1223,6 @@ public class Group2PL extends JFrame {
             return new String[] { "USERS", "full_name", "username" };
         }
 
-        
-
         return null;
     }
 
@@ -1279,7 +1273,7 @@ public class Group2PL extends JFrame {
 
     private void loadTableData(String tableName, DefaultTableModel model, boolean fullAccess, int userId) {
         try {
-            ResultSet rs = businessLayer.viewTable(tableName , fullAccess, userId);
+            ResultSet rs = businessLayer.viewTable(tableName, fullAccess, userId);
             displayResultSet(rs, model);
         } catch (Exception ex) {
             showError("Error loading table: " + ex.getMessage());
@@ -1299,11 +1293,11 @@ public class Group2PL extends JFrame {
                 for (int i = 1; i <= colCount; i++) {
                     String colName = meta.getColumnName(i);
                     if (colName.equalsIgnoreCase("created_at")) {
-                        continue; 
+                        continue;
                     }
                     String displayLabel = (colName.equalsIgnoreCase("password_hash"))
-                                    ? "password"
-                                    : colName;
+                            ? "password"
+                            : colName;
                     panel.add(new JLabel(displayLabel + ":"));
 
                     if (colName.toLowerCase().endsWith("_id") && i == 1) {
@@ -1312,8 +1306,7 @@ public class Group2PL extends JFrame {
                         field.setEnabled(false);
                         inputComponents[i - 1] = field;
                         panel.add(field);
-                    }
-                    else if (colName.toLowerCase().endsWith("_id")) {
+                    } else if (colName.toLowerCase().endsWith("_id")) {
                         String[] fkInfo = getForeignKeyInfo("USERS", colName);
                         if (fkInfo != null) {
                             JComboBox<ForeignKeyItem> combo = createForeignKeyDropdown(
@@ -1325,19 +1318,16 @@ public class Group2PL extends JFrame {
                             inputComponents[i - 1] = field;
                             panel.add(field);
                         }
-                    }
-                    else if(colName.equals("role")) {
+                    } else if (colName.equals("role")) {
                         String[] roles = { "Admin", "Driver", "Student" };
                         JComboBox<String> combo = new JComboBox<>(roles);
                         inputComponents[i - 1] = combo;
                         panel.add(combo);
-                    }
-                    else if (colName.equalsIgnoreCase("password_hash")) {
+                    } else if (colName.equalsIgnoreCase("password_hash")) {
                         JTextField passField = new JTextField(20);
                         inputComponents[i - 1] = passField;
                         panel.add(passField);
-                    }
-                    else {
+                    } else {
                         JTextField field = new JTextField(20);
                         inputComponents[i - 1] = field;
                         panel.add(field);
@@ -1378,10 +1368,10 @@ public class Group2PL extends JFrame {
                 }
                 valuesArray.add(value);
             }
-            
+
             boolean success = businessLayer.addUser(valuesArray.get(1), valuesArray.get(2), valuesArray.get(3),
                     valuesArray.get(4), valuesArray.get(5), valuesArray.get(6));
-            
+
             if (success) {
                 showSuccess("Record created successfully!");
                 loadTableData("USERS", model, true, currentUser.getUserId());

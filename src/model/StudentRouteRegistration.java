@@ -1,7 +1,7 @@
 /*
 Group 2
 Members: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi
-Date: 11/19/2025
+Date: 11/23/2025
 */
 package model;
 
@@ -28,9 +28,9 @@ public class StudentRouteRegistration {
     }
 
     // Constructor with all fields
-    public StudentRouteRegistration(int registrationId, int studentId, int routeId, 
-                                   Timestamp registrationDate, Date expiryDate, 
-                                   String status, BigDecimal creditsPaid) {
+    public StudentRouteRegistration(int registrationId, int studentId, int routeId,
+            Timestamp registrationDate, Date expiryDate,
+            String status, BigDecimal creditsPaid) {
         this.registrationId = registrationId;
         this.studentId = studentId;
         this.routeId = routeId;
@@ -41,8 +41,8 @@ public class StudentRouteRegistration {
     }
 
     // Constructor without registrationId (for new registrations)
-    public StudentRouteRegistration(int studentId, int routeId, Date expiryDate, 
-                                   String status, BigDecimal creditsPaid) {
+    public StudentRouteRegistration(int studentId, int routeId, Date expiryDate,
+            String status, BigDecimal creditsPaid) {
         this.studentId = studentId;
         this.routeId = routeId;
         this.expiryDate = expiryDate;

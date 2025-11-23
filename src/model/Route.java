@@ -1,7 +1,7 @@
 /*
 Group 2
 Members: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi
-Date: 11/18/2025
+Date: 11/23/2025
 */
 
 package model;
@@ -31,9 +31,9 @@ public class Route {
     }
 
     // Constructor with all fields
-    public Route(int routeId, String routeName, String routeCode, String description, 
-                 BigDecimal distanceKm, Integer estimatedDurationMinutes, 
-                 BigDecimal creditsRequired, boolean isActive, Timestamp createdAt) {
+    public Route(int routeId, String routeName, String routeCode, String description,
+            BigDecimal distanceKm, Integer estimatedDurationMinutes,
+            BigDecimal creditsRequired, boolean isActive, Timestamp createdAt) {
         this.routeId = routeId;
         this.routeName = routeName;
         this.routeCode = routeCode;
@@ -46,9 +46,9 @@ public class Route {
     }
 
     // Constructor without routeId (for new routes)
-    public Route(String routeName, String routeCode, String description, 
-                 BigDecimal distanceKm, Integer estimatedDurationMinutes, 
-                 BigDecimal creditsRequired) {
+    public Route(String routeName, String routeCode, String description,
+            BigDecimal distanceKm, Integer estimatedDurationMinutes,
+            BigDecimal creditsRequired) {
         this.routeName = routeName;
         this.routeCode = routeCode;
         this.description = description;
