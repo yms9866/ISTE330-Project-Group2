@@ -37,6 +37,8 @@ public class Group2DL {
             connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
             isConnected = true;
             System.out.println("Connected to database successfully!");
+            System.out.println("Group 2\nMembers: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi\nDate: 11/23/2025");
+        
             return true;
         } catch (ClassNotFoundException | SQLException e) {
             System.err.println("Connection failed: " + e.getMessage());

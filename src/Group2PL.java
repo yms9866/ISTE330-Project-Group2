@@ -893,7 +893,6 @@ public class Group2PL extends JFrame {
             try {
                 model.setRowCount(0);
                 ArrayList<Transaction> transactions = businessLayer.getTransactionHistory(currentUser.getUserId());
-                System.out.println("Fetched " + transactions);
                 for (Transaction t : transactions) {
                     model.addRow(new Object[] {
                             t.getTransactionDate(),
