@@ -36,13 +36,13 @@ public class Group2BL {
         return tableName != null && tableName.matches(regex);
     }
 
-    public ResultSet viewTable(String tableName) { //\ Validate table name (prevent SQL injection) 
+    public ResultSet viewTable(String tableName, boolean fullAccess, int userId) { //\ Validate table name (prevent SQL injection) 
         if (!isValidTableName(tableName)) 
         {
             System.err.println("ERROR: Invalid table name");
             return null;
         }
-        return dataLayer.displayTable(tableName);
+        return dataLayer.displayTable(tableName, fullAccess, userId);
     }
 
     public User authenticateUser(String username, String password) {
@@ -57,29 +57,23 @@ public class Group2BL {
         return dataLayer.login(username, password);
     }
 
-    public boolean addNewClient(String username, String password, String fullName,
-            String email, String phone) {
+    public boolean addUser(String username, String password, String fullName,
+            String email, String phone, String role) {
         if (!validateUserInputs(username, password, fullName, email))
             return false;
-        User user = new User(username, null, fullName, email, phone, "Student");
+        User user = new User(username, null, fullName, email, phone, role);
         return dataLayer.addUser(user, password);
     }
 
-    public boolean addNewAdmin(String username, String password, String fullName,
-            String email, String phone) {
-        if (!validateUserInputs(username, password, fullName, email))
-            return false;
-        User user = new User(username, null, fullName, email, phone, "Admin");
-        return dataLayer.addUser(user, password);
+    public ResultSet getUserSpecificData(String tableName, int userId) {
+        if (!isValidTableName(tableName)) {
+            System.err.println("ERROR: Invalid table name");
+            return null;
+        }
+        return dataLayer.getUserSpecificData(tableName, userId);
     }
 
-    public boolean addNewDriver(String username, String password, String fullName,
-            String email, String phone) {
-        if (!validateUserInputs(username, password, fullName, email))
-            return false;
-        User user = new User(username, null, fullName, email, phone, "Driver");
-        return dataLayer.addUser(user, password);
-    }
+
 
     public String transferCredits(int sourceUserId, int destUserId, double amount) {
         if (amount <= 0)
@@ -102,11 +96,7 @@ public class Group2BL {
         return dataLayer.getAccountBalance(userId);
     }
 
-    public String registerStudentForRoute(int studentId, int routeId) {
-        if (routeId <= 0)
-            return "ERROR: Invalid route ID";
-        return dataLayer.registerForRoute(studentId, routeId);
-    }
+   
 
     public ArrayList<Route> viewAvailableRoutes() {
         return dataLayer.getAllRoutes();
@@ -156,18 +146,6 @@ public class Group2BL {
         return dataLayer.getShuttleNumberById(shuttleId);
     }
 
-    public String updateLocation(int shuttleId, double latitude, double longitude,
-            double speedKmh, int heading) {
-        if (latitude < -90 || latitude > 90)
-            return "ERROR: Invalid latitude. Must be between -90 and 90";
-        if (longitude < -180 || longitude > 180)
-            return "ERROR: Invalid longitude. Must be between -180 and 180";
-        if (speedKmh < 0 || speedKmh > 200)
-            return "ERROR: Invalid speed. Must be between 0 and 200 km/h";
-        if (heading < 0 || heading > 359)
-            return "ERROR: Invalid heading. Must be between 0 and 359 degrees";
-        return dataLayer.updateShuttleLocation(shuttleId, latitude, longitude, speedKmh, heading);
-    }
 
     private boolean validateUserInputs(String username, String password,
             String fullName, String email) {
@@ -220,5 +198,24 @@ public class Group2BL {
 
     public Group2DL getDataLayer() {
         return dataLayer;
+    }
+
+    public ArrayList<Transaction> getTransactionHistory(int userId) {
+        if (userId <= 0) {
+            System.err.println("ERROR: Invalid user ID");
+            return new ArrayList<>();
+        }
+
+        return dataLayer.getUserTransactionHistory(userId);
+    }
+
+    public String getUserNameById(int userId) {
+        return dataLayer.getUserNameById(userId);
+    }
+    public User getUserById(int userId) {
+        return dataLayer.getUserById(userId);
+    }
+    public String hashPassword(String password) {
+        return dataLayer.hashPassword(password);
     }
 }

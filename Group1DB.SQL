@@ -131,13 +131,19 @@ CREATE TABLE SHUTTLE_SCHEDULE (
     INDEX idx_route (route_id),
     INDEX idx_day (day_of_week)
 ) ENGINE = InnoDB;
--- ============================================
--- POPULATE DATABASE WITH SAMPLE DATA
--- ============================================
--- Insert Users (passwords are SHA-256 hashes)
--- Admin users: password = "admin123" -> hash
--- Driver users: password = "driver123" -> hash
--- Student users: password = "student123" -> hash
+
+-- Table: TRANSACTIONS - stores all financial transactions between accounts
+CREATE TABLE TRANSACTIONS (
+    transaction_id INT AUTO_INCREMENT PRIMARY KEY,
+    senderid INT NOT NULL,
+    recieverid INT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (senderid) REFERENCES USERS(user_id),
+    FOREIGN KEY (recieverid) REFERENCES USERS(user_id),
+    CHECK (amount > 0)
+) ENGINE = InnoDB;
+
 INSERT INTO USERS (
         username,
         password_hash,
@@ -576,9 +582,5 @@ FROM SHUTTLE_LOCATION sl1
     ) sl2 ON sl1.shuttle_id = sl2.shuttle_id
     AND sl1.timestamp = sl2.max_timestamp
     JOIN SHUTTLE s ON sl1.shuttle_id = s.shuttle_id;
--- Grant permissions (adjust as needed for your MariaDB setup)
--- GRANT SELECT ON ShuttleManagementDB.* TO 'student_user'@'localhost';
--- GRANT SELECT, INSERT, UPDATE ON ShuttleManagementDB.* TO 'driver_user'@'localhost';
--- GRANT ALL PRIVILEGES ON ShuttleManagementDB.* TO 'admin_user'@'localhost';
--- Display confirmation message
+
 SELECT 'Database ShuttleManagementDB created and populated successfully!' AS Status;

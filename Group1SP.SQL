@@ -8,8 +8,7 @@ DROP PROCEDURE IF EXISTS sp_display_table;
 DROP PROCEDURE IF EXISTS sp_transfer_credits;
 DROP PROCEDURE IF EXISTS sp_register_for_route;
 DROP PROCEDURE IF EXISTS sp_update_shuttle_location;
-DELIMITER $$ -- ============================================
--- Stored Procedure 1: Display any table by name
+DELIMITER $$ 
 -- ============================================
 CREATE PROCEDURE sp_display_table(IN table_name VARCHAR(100)) BEGIN
 DECLARE table_exists INT DEFAULT 0;
@@ -253,14 +252,5 @@ VALUES (
         NOW()
     );
 SET result_message = 'SUCCESS: Shuttle location updated';
-END $$ DELIMITER;
--- Test the stored procedures
--- SELECT 'Stored procedures created successfully!' AS Status;
--- Example usage (commented out):
--- CALL sp_display_table('USERS');
--- CALL sp_transfer_credits(6, 7, 10.00, @msg);
--- SELECT @msg;
--- CALL sp_register_for_route(10, 1, @msg);
--- SELECT @msg;
--- CALL sp_update_shuttle_location(1, 40.7200, -74.0150, 45.5, 90, @msg);
--- SELECT @msg;
+END $$ 
+DELIMITER ;

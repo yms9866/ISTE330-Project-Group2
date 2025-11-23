@@ -9,10 +9,11 @@ import javax.swing.border.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.sql.Connection;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.Statement;
 import java.util.ArrayList;
 import model.*;
 
@@ -35,11 +36,9 @@ public class Group2PL extends JFrame {
     private final Color PRIMARY_DARK = new Color(31, 97, 141);
     private final Color SUCCESS = new Color(46, 204, 113);
     private final Color DANGER = new Color(231, 76, 60);
-    private final Color WARNING = new Color(241, 196, 15);
     private final Color INFO = new Color(52, 152, 219);
     private final Color DARK = new Color(44, 62, 80);
     private final Color ACCENT = new Color(155, 89, 182);
-
 
     public Group2PL() {
         businessLayer = new Group2BL();
@@ -47,7 +46,7 @@ public class Group2PL extends JFrame {
     }
 
     private void initGUI() {
-        setTitle("🚌 Group 2: Shuttle Management System");
+        setTitle("Group 2: Shuttle Management System");
         setSize(1400, 900);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -73,8 +72,7 @@ public class Group2PL extends JFrame {
         mainPanel.add(createDriverPanel(), "DRIVER");
         mainPanel.add(createStudentPanel(), "STUDENT");
 
-        //  i want to show our name in the center of the initial screen
-         JPanel introPanel = new JPanel(new GridBagLayout()) {
+        JPanel introPanel = new JPanel(new GridBagLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -85,19 +83,19 @@ public class Group2PL extends JFrame {
                 g2d.setPaint(gradient);
                 g2d.fillRect(0, 0, getWidth(), getHeight());
             }
-         };
-            JLabel introLabel = new JLabel("<html><div style='text-align: center;'>" +
-                    "<h1 style='padding: 10px; font-size: 48px; color: white;'>Group 2</h1>" +
-                    "<h2 style='padding: 10px; font-size: 24px; color: white;'>Shuttle Management System</h2>" +
-                    "<p style='padding: 10px; font-size: 18px; color: white;'>Members: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi</p>"
-                    +
-                    "<p style='padding: 10px; font-size: 18px; color: white;'>Date: 11/17/2025</p>" +
-                    "</div></html>");
-          
+        };
+        JLabel introLabel = new JLabel("<html><div style='text-align: center;'>" +
+                "<h1 style='padding: 10px; font-size: 48px; color: white;'>Group 2</h1>" +
+                "<h2 style='padding: 10px; font-size: 24px; color: white;'>Shuttle Management System</h2>" +
+                "<p style='padding: 10px; font-size: 18px; color: white;'>Members: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi</p>"
+                +
+                "<p style='padding: 10px; font-size: 18px; color: white;'>Date: 11/17/2025</p>" +
+                "</div></html>");
+
         JButton continueButton = new JButton("Continue to Login");
         continueButton.addActionListener(e -> cardLayout.show(mainPanel, "LOGIN"));
         continueButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        // bottom center the button
+        
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -107,7 +105,6 @@ public class Group2PL extends JFrame {
         introPanel.add(introLabel);
         mainPanel.add(introPanel, "INTRO");
         cardLayout.show(mainPanel, "INTRO");
-
 
         add(mainPanel);
         setVisible(true);
@@ -159,7 +156,6 @@ public class Group2PL extends JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(20, 20, 20, 20);
 
-        
         JPanel card = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -168,12 +164,11 @@ public class Group2PL extends JFrame {
                 g2d.setColor(getBackground());
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
 
-                // Header accent
                 g2d.setColor(PRIMARY);
                 g2d.fillRoundRect(0, 0, getWidth(), 8, 25, 25);
             }
         };
-       
+
         card.setBackground(new Color(255, 255, 255, 230));
         card.setLayout(new GridBagLayout());
         card.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
@@ -185,7 +180,7 @@ public class Group2PL extends JFrame {
         c.gridwidth = 2;
         c.insets = new Insets(10, 10, 30, 10);
 
-        // App Icon and Title
+    
         JLabel iconLabel = new JLabel("🚌");
         iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
         card.add(iconLabel, c);
@@ -238,7 +233,7 @@ public class Group2PL extends JFrame {
         fc.gridy = 0;
         fc.anchor = GridBagConstraints.WEST;
         fc.insets = new Insets(5, 5, 5, 5);
-        
+
         JLabel userLabel = new JLabel("Username");
         userLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
         userLabel.setForeground(DARK);
@@ -246,13 +241,13 @@ public class Group2PL extends JFrame {
 
         fc.gridy++;
         fc.gridwidth = 2;
-        fc.fill = GridBagConstraints.HORIZONTAL; // ★ allow stretch
-        fc.weightx = 1.0; // ★ give weight
+        fc.fill = GridBagConstraints.HORIZONTAL; 
+        fc.weightx = 1.0; 
         usernameField = createModernTextField();
         formPanel.add(usernameField, fc);
 
         fc.gridy++;
-        fc.gridwidth = 1; // reset for label
+        fc.gridwidth = 1; 
         JLabel passLabel = new JLabel("Password");
         passLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
         passLabel.setForeground(DARK);
@@ -260,8 +255,8 @@ public class Group2PL extends JFrame {
 
         fc.gridy++;
         fc.gridwidth = 2;
-        fc.fill = GridBagConstraints.HORIZONTAL; // ★ allow stretch
-        fc.weightx = 1.0; // ★ give weight
+        fc.fill = GridBagConstraints.HORIZONTAL; 
+        fc.weightx = 1.0; 
         passwordField = createModernPasswordField();
         formPanel.add(passwordField, fc);
 
@@ -278,42 +273,16 @@ public class Group2PL extends JFrame {
         statusLabel = new JLabel(" ");
         statusLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
         statusLabel.setForeground(DANGER);
+        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
         card.add(statusLabel, c);
 
-        // Test credentials
-        c.gridy++;
-        JPanel credsPanel = new JPanel(new BorderLayout());
-        credsPanel.setBackground(new Color(248, 249, 250));
-        credsPanel.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(new Color(222, 226, 230), 1),
-                new EmptyBorder(15, 15, 15, 15)));
-
-        JLabel credsTitle = new JLabel("Test Credentials");
-        credsTitle.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        credsTitle.setForeground(DARK);
-        credsPanel.add(credsTitle, BorderLayout.NORTH);
-
-        JTextArea creds = new JTextArea(
-                "👨‍💼 Admin: admin1 / admin123\n\n" +
-                        "🚗 Driver: driver1 / driver123\n\n" +
-                        "🎓 Student: student1 / student123");
-        creds.setEditable(false);
-        creds.setBackground(new Color(248, 249, 250));
-        creds.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        creds.setForeground(new Color(108, 117, 125));
-        credsPanel.add(creds, BorderLayout.CENTER);
-
-        card.add(credsPanel, c);
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
         panel.add(card, gbc);
         return panel;
     }
 
     private JPanel createAdminPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(createModernHeader("👨‍💼 Admin Dashboard", "System Administrator"), BorderLayout.NORTH);
+        panel.add(createModernHeader("Admin Dashboard", "System Administrator"), BorderLayout.NORTH);
 
         // Admin can access all tables
         String[] adminTables = { "USERS", "ACCOUNTS", "SHUTTLE", "ROUTE", "STOP",
@@ -325,7 +294,7 @@ public class Group2PL extends JFrame {
 
     private JPanel createDriverPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(createModernHeader("🚗 Driver Dashboard", "Shuttle Operations"), BorderLayout.NORTH);
+        panel.add(createModernHeader("Driver Dashboard", "Shuttle Operations"), BorderLayout.NORTH);
 
         // Driver can access shuttle-related tables
         String[] driverTables = { "SHUTTLE", "SHUTTLE_LOCATION", "SHUTTLE_SCHEDULE", "ROUTE", "STOP" };
@@ -336,19 +305,18 @@ public class Group2PL extends JFrame {
 
     private JPanel createStudentPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(createModernHeader("🎓 Student Dashboard", "Campus Transportation"), BorderLayout.NORTH);
+        panel.add(createModernHeader("Student Dashboard", "Campus Transportation"), BorderLayout.NORTH);
 
         JTabbedPane tabs = new JTabbedPane(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
         tabs.setUI(new ModernTabbedPaneUI());
 
-        // Load all student data immediately
-        tabs.addTab("📊 My Account", createMyAccountPanel());
-        tabs.addTab("💳 Transfer Credits", createTransferCreditsPanel());
-        tabs.addTab("🛣️ Available Routes", createAvailableRoutesPanel());
-        tabs.addTab("📋 My Bookings", createMyBookingsPanel());
-        tabs.addTab("⏰ My Schedule", createMySchedulePanel());
-        tabs.addTab("📍 Track Shuttles", createTrackShuttlesPanel());
-
+        tabs.addTab("My Account", createMyAccountPanel());
+        tabs.addTab("Transfer Credits", createTransferCreditsPanel());
+        tabs.addTab("Available Routes", createAvailableRoutesPanel());
+        tabs.addTab("My Bookings", createMyBookingsPanel());
+        tabs.addTab("My Schedule", createMySchedulePanel());
+        tabs.addTab("Track Shuttles", createTrackShuttlesPanel());
+        tabs.addTab("Transaction History", createTransactionHistoryPanel());
         panel.add(tabs, BorderLayout.CENTER);
         return panel;
     }
@@ -403,9 +371,12 @@ public class Group2PL extends JFrame {
             rightPanel.add(userPanel);
         }
 
-        JButton logout = new JButton("🚪 Logout");
-        styleModernButton(logout, new Color(255, 255, 255, 40));
-        logout.setForeground(Color.WHITE);
+        JButton logout = new JButton("Logout");
+        logout.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        
+        logout.setPreferredSize(new Dimension(100, 40));
+        logout.setForeground(Color.RED);
+        logout.setBackground(new Color(255, 255, 255, 30));
         logout.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255, 80), 1));
         logout.addActionListener(e -> logout());
         rightPanel.add(logout);
@@ -429,7 +400,7 @@ public class Group2PL extends JFrame {
                 new LineBorder(new Color(222, 226, 230), 1),
                 new EmptyBorder(15, 15, 15, 15)));
 
-        JLabel leftTitle = new JLabel("📋 Available Tables");
+        JLabel leftTitle = new JLabel("Available Tables");
         leftTitle.setFont(new Font("Segoe UI", Font.BOLD, 16));
         leftTitle.setForeground(DARK);
         leftTitle.setBorder(new EmptyBorder(0, 0, 15, 0));
@@ -437,18 +408,73 @@ public class Group2PL extends JFrame {
 
         DefaultListModel<String> listModel = new DefaultListModel<>();
         for (String table : allowedTables) {
-            listModel.addElement("📊 " + table);
+            listModel.addElement(table);
         }
+
         JList<String> tableList = new JList<>(listModel);
         tableList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableList.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        tableList.setBackground(new Color(248, 249, 250));
-        tableList.setSelectionBackground(PRIMARY);
-        tableList.setSelectionForeground(Color.WHITE);
+        tableList.setOpaque(false); 
+        tableList.setFixedCellHeight(45);
         tableList.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
+        tableList.setCellRenderer(new ListCellRenderer<String>() {
+
+            Color normal = PRIMARY;
+            Color selected = PRIMARY.darker();
+            Color text = Color.WHITE;
+
+            JLabel cell = new JLabel() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    Graphics2D g2 = (Graphics2D) g;
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                    int w = getWidth();
+                    int h = getHeight();
+                    int arrow = 24; // arrow head size
+
+                    boolean isSelected = Boolean.TRUE.equals(getClientProperty("selected"));
+                    Color fill = isSelected ? selected : normal;
+
+                    Polygon p = new Polygon();
+                    p.addPoint(0, 0);
+                    p.addPoint(w - arrow, 0);
+                    p.addPoint(w, h / 2);
+                    p.addPoint(w - arrow, h);
+                    p.addPoint(0, h);
+
+                    g2.setColor(fill);
+                    g2.fillPolygon(p);
+
+                    super.paintComponent(g2);
+                }
+            };
+
+            {
+                cell.setOpaque(false);
+                cell.setForeground(text);
+                cell.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+                cell.setBorder(new EmptyBorder(10, 20, 10, 20));
+            }
+
+            @Override
+            public Component getListCellRendererComponent(
+                    JList<? extends String> list, String value, int index,
+                    boolean isSelected, boolean cellHasFocus) {
+
+                cell.setText(value);
+                cell.putClientProperty("selected", isSelected);
+                return cell;
+            }
+        });
+
+        // Scrollpanel stays same
         JScrollPane listScroll = new JScrollPane(tableList);
         listScroll.setBorder(BorderFactory.createLineBorder(new Color(222, 226, 230), 1));
+        listScroll.getViewport().setOpaque(false);
+        listScroll.setOpaque(false);
+
         leftPanel.add(listScroll, BorderLayout.CENTER);
 
         // Right side - Modern table content
@@ -458,13 +484,13 @@ public class Group2PL extends JFrame {
                 new LineBorder(new Color(222, 226, 230), 1),
                 new EmptyBorder(20, 20, 20, 20)));
 
-        JLabel rightTitle = new JLabel("📈 Table Data");
+        JLabel rightTitle = new JLabel("Table Data");
         rightTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         rightTitle.setForeground(DARK);
         rightTitle.setBorder(new EmptyBorder(0, 0, 15, 0));
         rightPanel.add(rightTitle, BorderLayout.NORTH);
 
-        // Modern table
+
         DefaultTableModel tableModel = new DefaultTableModel();
         JTable dataTable = new JTable(tableModel) {
             @Override
@@ -494,67 +520,49 @@ public class Group2PL extends JFrame {
         opsPanel.setBackground(Color.WHITE);
         opsPanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(222, 226, 230)));
 
-        JButton refreshBtn = new JButton("🔄 Refresh");
+        JButton refreshBtn = new JButton("Refresh");
         styleModernButton(refreshBtn, INFO);
 
-        JButton createBtn = new JButton("➕ Create");
+        
+        JButton createBtn = new JButton("Create User");
+        createBtn.setEnabled(false);
+        createBtn.setVisible(false);
         styleModernButton(createBtn, SUCCESS);
-
-        JButton updateBtn = new JButton("✏️ Update");
-        styleModernButton(updateBtn, WARNING);
-
-        JButton deleteBtn = new JButton("🗑️ Delete");
-        styleModernButton(deleteBtn, DANGER);
-
         opsPanel.add(refreshBtn);
-        if (fullAccess || (userRole != null && userRole.equals("Admin"))) {
-            opsPanel.add(createBtn);
-            opsPanel.add(updateBtn);
-            opsPanel.add(deleteBtn);
-        }
+        opsPanel.add(createBtn);
 
         rightPanel.add(opsPanel, BorderLayout.SOUTH);
-
-        // Event handlers
+        
         tableList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && tableList.getSelectedValue() != null) {
-                String tableName = tableList.getSelectedValue().replace("📊 ", "");
-                loadTableData(tableName, tableModel);
+                String tableName = tableList.getSelectedValue();
+                boolean isfullAcces = businessLayer.getUserById(currentUser.getUserId()).getRole()
+                        .equalsIgnoreCase("Admin");
+                loadTableData(tableName, tableModel,isfullAcces, currentUser.getUserId());
+                // Only enable create when USERS table is selected and current user is Admin
+                boolean isAdmin = userRole != null && userRole.equalsIgnoreCase("Admin");
+                createBtn.setEnabled(isAdmin && tableName.equalsIgnoreCase("USERS"));
+                createBtn.setVisible(isAdmin && tableName.equalsIgnoreCase("USERS"));
             }
         });
 
         refreshBtn.addActionListener(e -> {
             if (tableList.getSelectedValue() != null) {
-                String tableName = tableList.getSelectedValue().replace("📊 ", "");
-                loadTableData(tableName, tableModel);
+                String tableName = tableList.getSelectedValue();
+                boolean isfullAcces = businessLayer.getUserById(currentUser.getUserId()).getRole()
+                        .equalsIgnoreCase("Admin");
+                loadTableData(tableName, tableModel,isfullAcces, currentUser.getUserId());
             }
         });
 
         createBtn.addActionListener(e -> {
-            if (tableList.getSelectedValue() != null) {
-                String tableName = tableList.getSelectedValue().replace("📊 ", "");
-                showCreateDialog(tableName, tableModel);
-            }
-        });
 
-        updateBtn.addActionListener(e -> {
-            int row = dataTable.getSelectedRow();
-            if (row >= 0 && tableList.getSelectedValue() != null) {
-                String tableName = tableList.getSelectedValue().replace("📊 ", "");
-                showUpdateDialog(tableName, tableModel, dataTable, row);
-            } else {
-                showError("Please select a row to update");
+            boolean isAdmin = userRole != null && userRole.equalsIgnoreCase("Admin");
+            if (!isAdmin) {
+                showError("Create action is only allowed for the USERS table (Admin only).");
+                return;
             }
-        });
-
-        deleteBtn.addActionListener(e -> {
-            int row = dataTable.getSelectedRow();
-            if (row >= 0 && tableList.getSelectedValue() != null) {
-                String tableName = tableList.getSelectedValue().replace("📊 ", "");
-                deleteRecord(tableName, tableModel, dataTable, row);
-            } else {
-                showError("Please select a row to delete");
-            }
+            showCreateUserDialog(tableModel);
         });
 
         splitPane.setLeftComponent(leftPanel);
@@ -569,7 +577,6 @@ public class Group2PL extends JFrame {
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
         panel.setBackground(Color.WHITE);
 
-        // Create a modern card layout
         JPanel contentPanel = new JPanel(new BorderLayout());
         contentPanel.setBackground(Color.WHITE);
         contentPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -582,60 +589,59 @@ public class Group2PL extends JFrame {
         area.setBackground(Color.WHITE);
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
+        // load button
+        JButton loadButton = new JButton("Load");
+        styleModernButton(loadButton, INFO);
+        loadButton.addActionListener(e -> {
+            double balance = businessLayer.viewAccountBalance(currentUser.getUserId());
+            StringBuilder sb = new StringBuilder();
+            sb.append("ACCOUNT OVERVIEW\n");
+            sb.append(String.format("Current Balance: %.2f credits\n\n", balance));
 
-        // Load data immediately without refresh button
-        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                double balance = businessLayer.viewAccountBalance(userId);
-                StringBuilder sb = new StringBuilder();
-                sb.append("💰 ACCOUNT OVERVIEW\n");
-                sb.append("═".repeat(50)).append("\n\n");
-                sb.append(String.format("Current Balance: %.2f credits\n\n", balance));
-
-                try {
-                    ArrayList<StudentRouteRegistration> registrations = businessLayer.getStudentRegistrations(userId);
-                    sb.append("📋 REGISTERED ROUTES\n");
-                    sb.append("═".repeat(50)).append("\n");
-                    if (registrations.isEmpty()) {
-                        sb.append("No routes registered yet.\n");
-                    } else {
-                        for (StudentRouteRegistration reg : registrations) {
-                            String routeName = businessLayer.getRouteNameById(reg.getRouteId());
-                            String routeCode = businessLayer.getRouteCodeById(reg.getRouteId());
-                            String status = reg.getStatus();
-                            String statusIcon = status.equals("Active") ? "✅" : "⏸️";
-                            sb.append(String.format("%s %s (%s) - %s\n",
-                                    statusIcon, routeName, routeCode, status));
-                        }
+            try {
+                ArrayList<StudentRouteRegistration> registrations = businessLayer.getStudentRegistrations(currentUser.getUserId());
+                sb.append("REGISTERED ROUTES\n");
+                if (registrations.isEmpty()) {
+                    sb.append("No routes registered yet.\n");
+                } else {
+                    for (StudentRouteRegistration reg : registrations) {
+                        String routeName = businessLayer.getRouteNameById(reg.getRouteId());
+                        String routeCode = businessLayer.getRouteCodeById(reg.getRouteId());
+                        String status = reg.getStatus();
+                        String statusIcon = status.equals("Active") ? "Active" : "Paused";
+                        sb.append(String.format("%s %s (%s) - %s\n",
+                                statusIcon, routeName, routeCode, status));
                     }
-                } catch (Exception ex) {
-                    sb.append("\n⚠️ Error loading routes: ").append(ex.getMessage());
                 }
+            } catch (Exception ex) {
+                sb.append("\nError loading routes: ").append(ex.getMessage());
+            }   
 
-                area.setText(sb.toString());
-                return null;
-            }
-        };
-        worker.execute();
+            area.setText(sb.toString());
+        });
+        
+        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottom.setBackground(Color.WHITE);
+        bottom.setBorder(new EmptyBorder(15, 0, 0, 0));
+        bottom.add(loadButton);
 
+        contentPanel.add(bottom, BorderLayout.SOUTH);
         contentPanel.add(new JScrollPane(area), BorderLayout.CENTER);
         panel.add(contentPanel, BorderLayout.CENTER);
+
 
         return panel;
     }
 
     private JPanel createTransferCreditsPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        JPanel panel = new JPanel(new GridBagLayout()); 
+        panel.setBorder(new EmptyBorder(40, 40, 40, 40));
         panel.setBackground(Color.WHITE);
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        splitPane.setDividerLocation(400);
-
-        // Left - Transfer form
+        // The card itself
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(Color.WHITE);
+        formPanel.setPreferredSize(new Dimension(400, 320)); // width, height
         formPanel.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(new Color(222, 226, 230), 1),
                 new EmptyBorder(25, 25, 25, 25)));
@@ -644,7 +650,7 @@ public class Group2PL extends JFrame {
         c.insets = new Insets(10, 10, 10, 10);
         c.fill = GridBagConstraints.HORIZONTAL;
 
-        JLabel title = new JLabel("💳 Transfer Credits");
+        JLabel title = new JLabel("Transfer Credits");
         title.setFont(new Font("Segoe UI", Font.BOLD, 18));
         title.setForeground(DARK);
         c.gridx = 0;
@@ -659,7 +665,12 @@ public class Group2PL extends JFrame {
         formPanel.add(destLabel, c);
 
         c.gridx = 1;
+        c.gridy = 1;
+        c.weightx = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+
         JTextField destId = createModernTextField();
+        destId.setPreferredSize(new Dimension(200, 35));
         formPanel.add(destId, c);
 
         c.gridx = 0;
@@ -669,18 +680,26 @@ public class Group2PL extends JFrame {
         formPanel.add(amountLabel, c);
 
         c.gridx = 1;
+        c.gridy = 2;
+        c.weightx = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+
         JTextField amount = createModernTextField();
+        amount.setPreferredSize(new Dimension(200, 35));
         formPanel.add(amount, c);
 
         c.gridx = 0;
         c.gridy++;
         c.gridwidth = 2;
-        JButton transfer = new JButton("🚀 Transfer Credits");
+        JButton transfer = new JButton("Transfer Credits");
         styleModernButton(transfer, ACCENT);
         transfer.addActionListener(e -> {
             try {
-                String result = businessLayer.transferCredits(userId,
-                        Integer.parseInt(destId.getText()), Double.parseDouble(amount.getText()));
+                String result = businessLayer.transferCredits(
+                        currentUser.getUserId(),
+                        Integer.parseInt(destId.getText()),
+                        Double.parseDouble(amount.getText()));
+
                 if (result.startsWith("SUCCESS")) {
                     showSuccess(result);
                     destId.setText("");
@@ -694,57 +713,9 @@ public class Group2PL extends JFrame {
         });
         formPanel.add(transfer, c);
 
-        // Right - Students list
-        JPanel listPanel = new JPanel(new BorderLayout());
-        listPanel.setBackground(Color.WHITE);
-        listPanel.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(new Color(222, 226, 230), 1),
-                new EmptyBorder(25, 25, 25, 25)));
-
-        JLabel listTitle = new JLabel("🎓 Available Students");
-        listTitle.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        listTitle.setForeground(DARK);
-        listTitle.setBorder(new EmptyBorder(0, 0, 15, 0));
-        listPanel.add(listTitle, BorderLayout.NORTH);
-
-        DefaultTableModel model = new DefaultTableModel(
-                new String[] { "ID", "Name", "Balance" }, 0);
-        JTable table = new JTable(model);
-        table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        table.setRowHeight(30);
-
-        // Load student data immediately
-        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                try {
-                    ResultSet rs = businessLayer.viewTable("USERS");
-                    if (rs != null) {
-                        while (rs.next()) {
-                            if (rs.getString("role").equals("Student")) {
-                                int studentId = rs.getInt("user_id");
-                                double balance = businessLayer.viewAccountBalance(studentId);
-                                model.addRow(new Object[] {
-                                        studentId,
-                                        rs.getString("full_name"),
-                                        String.format("%.2f", balance)
-                                });
-                            }
-                        }
-                    }
-                } catch (Exception ex) {
-                    showError("Error loading students: " + ex.getMessage());
-                }
-                return null;
-            }
-        };
-        worker.execute();
-
-        listPanel.add(new JScrollPane(table), BorderLayout.CENTER);
-
-        splitPane.setLeftComponent(formPanel);
-        splitPane.setRightComponent(listPanel);
-        panel.add(splitPane, BorderLayout.CENTER);
+        GridBagConstraints center = new GridBagConstraints();
+        center.anchor = GridBagConstraints.CENTER;
+        panel.add(formPanel, center);
 
         return panel;
     }
@@ -754,6 +725,7 @@ public class Group2PL extends JFrame {
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
         panel.setBackground(Color.WHITE);
 
+        // Card container
         JPanel contentPanel = new JPanel(new BorderLayout());
         contentPanel.setBackground(Color.WHITE);
         contentPanel.setBorder(BorderFactory.createCompoundBorder(
@@ -762,57 +734,42 @@ public class Group2PL extends JFrame {
 
         DefaultTableModel model = new DefaultTableModel(
                 new String[] { "ID", "Name", "Code", "Distance", "Duration", "Credits" }, 0);
+
         JTable table = new JTable(model);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         table.setRowHeight(35);
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
 
-        // Load routes data immediately
-        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                try {
-                    ArrayList<Route> routes = businessLayer.viewAvailableRoutes();
-                    for (Route route : routes) {
-                        model.addRow(new Object[] {
-                                route.getRouteId(), route.getRouteName(),
-                                route.getRouteCode(), route.getDistanceKm() + " km",
-                                route.getEstimatedDurationMinutes() + " min",
-                                route.getCreditsRequired() + " ⭐"
-                        });
-                    }
-                } catch (Exception ex) {
-                    showError("Error loading routes: " + ex.getMessage());
+        JButton loadButton = new JButton("Load Routes");
+        styleModernButton(loadButton, INFO);
+        loadButton.addActionListener(e -> {
+            try {
+                ArrayList<Route> routes = businessLayer.viewAvailableRoutes();
+                for (Route route : routes) {
+                    model.addRow(new Object[] {
+                            route.getRouteId(),
+                            route.getRouteName(),
+                            route.getRouteCode(),
+                            route.getDistanceKm() + " km",
+                            route.getEstimatedDurationMinutes() + " min",
+                            route.getCreditsRequired() + " Credits"
+                    });
                 }
-                return null;
+            } catch (Exception ex) {
+                showError("Error loading routes: " + ex.getMessage());
             }
-        };
-        worker.execute();
+        });
 
         contentPanel.add(new JScrollPane(table), BorderLayout.CENTER);
 
+   
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottom.setBackground(Color.WHITE);
         bottom.setBorder(new EmptyBorder(15, 0, 0, 0));
-
-        JButton register = new JButton("📝 Register for Selected Route");
-        styleModernButton(register, SUCCESS);
-        register.addActionListener(e -> {
-            int row = table.getSelectedRow();
-            if (row >= 0) {
-                int routeId = (int) model.getValueAt(row, 0);
-                String result = businessLayer.registerStudentForRoute(userId, routeId);
-                if (result.startsWith("SUCCESS")) {
-                    showSuccess(result);
-                } else {
-                    showError(result);
-                }
-            } else {
-                showError("Please select a route");
-            }
-        });
-        bottom.add(register);
+        bottom.add(loadButton);
 
         contentPanel.add(bottom, BorderLayout.SOUTH);
+
         panel.add(contentPanel, BorderLayout.CENTER);
 
         return panel;
@@ -835,14 +792,13 @@ public class Group2PL extends JFrame {
         table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         table.setRowHeight(35);
 
-        // Load bookings data immediately
-        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-            @Override
-            protected Void doInBackground() throws Exception {
+        JButton loadButton = new JButton("Load Bookings");
+        styleModernButton(loadButton, INFO);
+        loadButton.addActionListener(e -> { 
                 try {
                     ArrayList<StudentRouteRegistration> registrations = businessLayer.getStudentRegistrations(userId);
                     for (StudentRouteRegistration reg : registrations) {
-                        String statusIcon = reg.getStatus().equals("Active") ? "✅" : "⏸️";
+                        String statusIcon = reg.getStatus().equals("Active") ? "Active" : "Paused";
                         model.addRow(new Object[] {
                                 businessLayer.getRouteNameById(reg.getRouteId()),
                                 businessLayer.getRouteCodeById(reg.getRouteId()),
@@ -853,13 +809,16 @@ public class Group2PL extends JFrame {
                 } catch (Exception ex) {
                     showError("Error loading bookings: " + ex.getMessage());
                 }
-                return null;
-            }
-        };
-        worker.execute();
-
+            
+            });
         contentPanel.add(new JScrollPane(table), BorderLayout.CENTER);
         panel.add(contentPanel, BorderLayout.CENTER);
+        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottom.setBackground(Color.WHITE);
+        bottom.setBorder(new EmptyBorder(15, 0, 0, 0));
+        bottom.add(loadButton);
+        contentPanel.add(bottom, BorderLayout.SOUTH);
+
 
         return panel;
     }
@@ -880,38 +839,129 @@ public class Group2PL extends JFrame {
         JTable table = new JTable(model);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         table.setRowHeight(35);
-
-        // Load schedule data immediately
-        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                try {
-                    ArrayList<StudentRouteRegistration> registrations = businessLayer.getStudentRegistrations(userId);
-                    for (StudentRouteRegistration reg : registrations) {
-                        int routeId = reg.getRouteId();
-                        ArrayList<ShuttleSchedule> schedules = businessLayer.getSchedulesForRoute(routeId);
-                        for (ShuttleSchedule schedule : schedules) {
-                            model.addRow(new Object[] {
-                                    businessLayer.getRouteNameById(routeId),
-                                    schedule.getDayOfWeek(),
-                                    schedule.getDepartureTime(),
-                                    schedule.getArrivalTime(),
-                                    businessLayer.getShuttleNumberById(schedule.getShuttleId())
-                            });
-                        }
-                    }
-                } catch (Exception ex) {
-                    showError("Error loading schedule: " + ex.getMessage());
+        // load button
+        JButton loadButton = new JButton("Load Schedule");
+        styleModernButton(loadButton, INFO);
+        loadButton.addActionListener(e -> {
+        try {
+            ArrayList<StudentRouteRegistration> registrations = businessLayer.getStudentRegistrations(userId);
+            for (StudentRouteRegistration reg : registrations) {
+                int routeId = reg.getRouteId();
+                ArrayList<ShuttleSchedule> schedules = businessLayer.getSchedulesForRoute(routeId);
+                for (ShuttleSchedule schedule : schedules) {
+                    model.addRow(new Object[] {
+                            businessLayer.getRouteNameById(routeId),
+                            schedule.getDayOfWeek(),
+                            schedule.getDepartureTime(),
+                            schedule.getArrivalTime(),
+                            businessLayer.getShuttleNumberById(schedule.getShuttleId())
+                    });
                 }
-                return null;
             }
-        };
-        worker.execute();
+            } catch (Exception ex) {
+                showError("Error loading schedule: " + ex.getMessage());
+            }
+        });
 
         contentPanel.add(new JScrollPane(table), BorderLayout.CENTER);
         panel.add(contentPanel, BorderLayout.CENTER);
+        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottom.setBackground(Color.WHITE);
+        bottom.setBorder(new EmptyBorder(15, 0, 0, 0));
+        bottom.add(loadButton);
+        contentPanel.add(bottom, BorderLayout.SOUTH);
 
         return panel;
+    }
+
+    private JPanel createTransactionHistoryPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        panel.setBackground(Color.WHITE);
+
+        DefaultTableModel model = new DefaultTableModel(
+                new String[] { "Date", "Receiver Name", "Sender Name", "Amount"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        JTable table = new JTable(model);
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        table.setRowHeight(30);
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+
+        JButton loadButton = new JButton("Load Transactions");
+        styleModernButton(loadButton, INFO);
+        loadButton.addActionListener(e -> {
+            try {
+                model.setRowCount(0); 
+                ArrayList<Transaction> transactions = businessLayer.getTransactionHistory(currentUser.getUserId());
+                System.out.println("Fetched " + transactions);
+                for (Transaction t : transactions) {
+                    model.addRow(new Object[] {
+                            t.getTransactionDate(),
+                            businessLayer.getUserNameById(t.getRecieverid()),
+                            businessLayer.getUserNameById(t.getSenderid()),
+                            t.getAmount(),
+                    });
+                }
+            } catch (Exception ex) {
+                showError("Error loading transactions: " + ex.getMessage());
+            }
+        });
+
+        JButton downloadButton = new JButton("Download Report");
+        styleModernButton(downloadButton, SUCCESS);
+        downloadButton.addActionListener(e -> downloadTransactionReport(model));
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.add(loadButton);
+        buttonPanel.add(downloadButton);
+
+        panel.add(new JScrollPane(table), BorderLayout.CENTER);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private void downloadTransactionReport(DefaultTableModel model) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Save Transaction Report");
+        fileChooser.setSelectedFile(new File("transaction_report.csv"));
+        
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            if (!fileToSave.getName().toLowerCase().endsWith(".csv")) {
+                fileToSave = new File(fileToSave.getAbsolutePath() + ".csv");
+            }
+            
+            try (PrintWriter writer = new PrintWriter(fileToSave)) {
+                // Write header
+                for (int i = 0; i < model.getColumnCount(); i++) {
+                    writer.write(model.getColumnName(i));
+                    if (i < model.getColumnCount() - 1) writer.write(",");
+                }
+                writer.write("\n");
+                
+                // Write data
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    for (int j = 0; j < model.getColumnCount(); j++) {
+                        Object value = model.getValueAt(i, j);
+                        writer.write(value != null ? value.toString() : "");
+                        if (j < model.getColumnCount() - 1) writer.write(",");
+                    }
+                    writer.write("\n");
+                }
+                
+                showSuccess("Transaction report downloaded successfully!");
+            } catch (IOException ex) {
+                showError("Error saving file: " + ex.getMessage());
+            }
+        }
     }
 
     private JPanel createTrackShuttlesPanel() {
@@ -926,36 +976,40 @@ public class Group2PL extends JFrame {
                 new EmptyBorder(25, 25, 25, 25)));
 
         DefaultTableModel model = new DefaultTableModel(
-                new String[] { "Shuttle", "📍 Latitude", "📍 Longitude", "🚀 Speed", "🕐 Last Update" }, 0);
+                new String[] { "Shuttle", "Latitude", "Longitude", "Speed", "Last Update" }, 0);
         JTable table = new JTable(model);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         table.setRowHeight(35);
 
-        // Load shuttle locations immediately
-        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                try {
-                    ArrayList<ShuttleLocation> locations = businessLayer.getShuttleLocations();
-                    for (ShuttleLocation loc : locations) {
-                        model.addRow(new Object[] {
-                                businessLayer.getShuttleNumberById(loc.getShuttleId()),
-                                String.format("%.6f", loc.getLatitude()),
-                                String.format("%.6f", loc.getLongitude()),
-                                loc.getSpeedKmh() + " km/h",
-                                loc.getTimestamp()
-                        });
-                    }
-                } catch (Exception ex) {
-                    showError("Error loading shuttle locations: " + ex.getMessage());
-                }
-                return null;
+        // load button
+       JButton loadButton = new JButton("Load Locations");
+       styleModernButton(loadButton, INFO);
+        loadButton.addActionListener(e -> {
+
+        try {
+            ArrayList<ShuttleLocation> locations = businessLayer.getShuttleLocations();
+            for (ShuttleLocation loc : locations) {
+                model.addRow(new Object[] {
+                        businessLayer.getShuttleNumberById(loc.getShuttleId()),
+                        String.format("%.6f", loc.getLatitude()),
+                        String.format("%.6f", loc.getLongitude()),
+                        loc.getSpeedKmh() + " km/h",
+                        loc.getTimestamp()
+                });
             }
-        };
-        worker.execute();
+        } catch (Exception ex) {
+            showError("Error loading shuttle locations: " + ex.getMessage());
+        }
+        });
 
         contentPanel.add(new JScrollPane(table), BorderLayout.CENTER);
         panel.add(contentPanel, BorderLayout.CENTER);
+        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        bottom.setBackground(Color.WHITE);
+        bottom.setBorder(new EmptyBorder(15, 0, 0, 0));
+        bottom.add(loadButton);
+        contentPanel.add(bottom, BorderLayout.SOUTH);
+        
 
         return panel;
     }
@@ -963,7 +1017,7 @@ public class Group2PL extends JFrame {
     // Modern UI Helper Methods
     private JTextField createModernTextField() {
         JTextField field = new JTextField(20);
-        field.setFont(new Font("Segoe UI", Font.PLAIN, 14)); 
+        field.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         field.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(new Color(206, 212, 218), 1),
                 new EmptyBorder(12, 15, 12, 15)));
@@ -1048,10 +1102,10 @@ public class Group2PL extends JFrame {
             connectBtn.setEnabled(false);
             disconnectBtn.setEnabled(true);
             loginBtn.setEnabled(true);
-            statusLabel.setText("✅ Connected successfully!");
+            statusLabel.setText("Connected successfully!");
             statusLabel.setForeground(SUCCESS);
         } else {
-            statusLabel.setText("❌ Connection failed!");
+            statusLabel.setText("Connection failed!");
             statusLabel.setForeground(DANGER);
         }
     }
@@ -1061,7 +1115,7 @@ public class Group2PL extends JFrame {
             connectBtn.setEnabled(true);
             disconnectBtn.setEnabled(false);
             loginBtn.setEnabled(false);
-            statusLabel.setText("🔌 Disconnected");
+            statusLabel.setText("Disconnected");
             statusLabel.setForeground(DANGER);
         }
     }
@@ -1076,7 +1130,7 @@ public class Group2PL extends JFrame {
             userId = currentUser.getUserId();
             userRole = currentUser.getRole();
 
-            statusLabel.setText("✅ Login successful!");
+            statusLabel.setText("Login successful!");
             statusLabel.setForeground(SUCCESS);
 
             if (userRole.equals("Admin")) {
@@ -1087,7 +1141,7 @@ public class Group2PL extends JFrame {
                 cardLayout.show(mainPanel, "STUDENT");
             }
         } else {
-            statusLabel.setText("❌ Invalid credentials!");
+            statusLabel.setText("Invalid credentials!");
             statusLabel.setForeground(DANGER);
         }
     }
@@ -1127,19 +1181,15 @@ public class Group2PL extends JFrame {
     }
 
     private void showSuccess(String msg) {
-        JOptionPane.showMessageDialog(this, msg, "✅ Success",
+        JOptionPane.showMessageDialog(this, msg, "Success",
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void showError(String msg) {
-        JOptionPane.showMessageDialog(this, msg, "❌ Error",
+        JOptionPane.showMessageDialog(this, msg, "Error",
                 JOptionPane.ERROR_MESSAGE);
     }
 
-    // Keep all your existing helper classes and methods...
-    // (Foreign key handling, table operations, etc. remain the same)
-
-    // Helper class to store foreign key dropdown items
     private class ForeignKeyItem {
         private int id;
         private String displayText;
@@ -1159,7 +1209,6 @@ public class Group2PL extends JFrame {
         }
     }
 
-    // Get foreign key reference information
     private String[] getForeignKeyInfo(String tableName, String columnName) {
         // Returns [referenceTable, displayColumn]
         // Map foreign key columns to their reference tables and display columns
@@ -1178,25 +1227,18 @@ public class Group2PL extends JFrame {
             return new String[] { "USERS", "full_name", "username" };
         }
 
-        if (columnName.equalsIgnoreCase("route_id")) {
-            return new String[] { "ROUTE", "route_name", "route_code" };
-        }
-
-        if (columnName.equalsIgnoreCase("shuttle_id")) {
-            return new String[] { "SHUTTLE", "shuttle_number", "license_plate" };
-        }
+        
 
         return null;
     }
 
-    // Populate dropdown with foreign key options
     private JComboBox<ForeignKeyItem> createForeignKeyDropdown(String refTable, String displayCol,
             String secondaryCol) {
         JComboBox<ForeignKeyItem> combo = new JComboBox<>();
         combo.addItem(new ForeignKeyItem(0, "-- Select --"));
 
         try {
-            ResultSet rs = businessLayer.viewTable(refTable);
+            ResultSet rs = businessLayer.viewTable(refTable, true, currentUser.getUserId());
             if (rs != null) {
                 ResultSetMetaData meta = rs.getMetaData();
                 int idColIndex = -1;
@@ -1218,7 +1260,6 @@ public class Group2PL extends JFrame {
                     }
                 }
 
-                // Populate combo box
                 while (rs.next()) {
                     int id = rs.getInt(idColIndex);
                     String display = rs.getString(displayColIndex);
@@ -1236,18 +1277,18 @@ public class Group2PL extends JFrame {
         return combo;
     }
 
-    private void loadTableData(String tableName, DefaultTableModel model) {
+    private void loadTableData(String tableName, DefaultTableModel model, boolean fullAccess, int userId) {
         try {
-            ResultSet rs = businessLayer.viewTable(tableName);
+            ResultSet rs = businessLayer.viewTable(tableName , fullAccess, userId);
             displayResultSet(rs, model);
         } catch (Exception ex) {
             showError("Error loading table: " + ex.getMessage());
         }
     }
 
-    private void showCreateDialog(String tableName, DefaultTableModel model) {
+    private void showCreateUserDialog(DefaultTableModel model) {
         try {
-            ResultSet rs = businessLayer.viewTable(tableName);
+            ResultSet rs = businessLayer.viewTable("USERS", true, userId);
             if (rs != null) {
                 ResultSetMetaData meta = rs.getMetaData();
                 int colCount = meta.getColumnCount();
@@ -1257,9 +1298,14 @@ public class Group2PL extends JFrame {
 
                 for (int i = 1; i <= colCount; i++) {
                     String colName = meta.getColumnName(i);
-                    panel.add(new JLabel(colName + ":"));
+                    if (colName.equalsIgnoreCase("created_at")) {
+                        continue; 
+                    }
+                    String displayLabel = (colName.equalsIgnoreCase("password_hash"))
+                                    ? "password"
+                                    : colName;
+                    panel.add(new JLabel(displayLabel + ":"));
 
-                    // Check if this is a primary key (first column, auto-increment)
                     if (colName.toLowerCase().endsWith("_id") && i == 1) {
                         JTextField field = new JTextField(20);
                         field.setText("AUTO");
@@ -1267,22 +1313,30 @@ public class Group2PL extends JFrame {
                         inputComponents[i - 1] = field;
                         panel.add(field);
                     }
-                    // Check if this is a foreign key
                     else if (colName.toLowerCase().endsWith("_id")) {
-                        String[] fkInfo = getForeignKeyInfo(tableName, colName);
+                        String[] fkInfo = getForeignKeyInfo("USERS", colName);
                         if (fkInfo != null) {
                             JComboBox<ForeignKeyItem> combo = createForeignKeyDropdown(
                                     fkInfo[0], fkInfo[1], fkInfo[2]);
                             inputComponents[i - 1] = combo;
                             panel.add(combo);
                         } else {
-                            // Fallback to text field if FK info not found
                             JTextField field = new JTextField(20);
                             inputComponents[i - 1] = field;
                             panel.add(field);
                         }
                     }
-                    // Regular field
+                    else if(colName.equals("role")) {
+                        String[] roles = { "Admin", "Driver", "Student" };
+                        JComboBox<String> combo = new JComboBox<>(roles);
+                        inputComponents[i - 1] = combo;
+                        panel.add(combo);
+                    }
+                    else if (colName.equalsIgnoreCase("password_hash")) {
+                        JTextField passField = new JTextField(20);
+                        inputComponents[i - 1] = passField;
+                        panel.add(passField);
+                    }
                     else {
                         JTextField field = new JTextField(20);
                         inputComponents[i - 1] = field;
@@ -1291,10 +1345,10 @@ public class Group2PL extends JFrame {
                 }
 
                 int result = JOptionPane.showConfirmDialog(this, panel,
-                        "Create New Record in " + tableName, JOptionPane.OK_CANCEL_OPTION);
+                        "Create New Record in USERS", JOptionPane.OK_CANCEL_OPTION);
 
                 if (result == JOptionPane.OK_OPTION) {
-                    createRecord(tableName, meta, inputComponents, model);
+                    createUserRecord(meta, inputComponents, model);
                 }
             }
         } catch (Exception ex) {
@@ -1302,204 +1356,40 @@ public class Group2PL extends JFrame {
         }
     }
 
-    private void createRecord(String tableName, ResultSetMetaData meta,
+    private void createUserRecord(ResultSetMetaData meta,
             JComponent[] inputComponents, DefaultTableModel model) {
         try {
-            StringBuilder cols = new StringBuilder();
-            StringBuilder vals = new StringBuilder();
+            ArrayList<String> valuesArray = new ArrayList<>();
 
             int colCount = meta.getColumnCount();
             for (int i = 1; i <= colCount; i++) {
-                String colName = meta.getColumnName(i);
                 String value = "";
 
-                // Get value from the appropriate component type
-                JComponent component = inputComponents[i - 1];
-                if (component instanceof JTextField) {
-                    value = ((JTextField) component).getText();
-                } else if (component instanceof JComboBox) {
-                    @SuppressWarnings("unchecked")
-                    JComboBox<ForeignKeyItem> combo = (JComboBox<ForeignKeyItem>) component;
-                    ForeignKeyItem selected = (ForeignKeyItem) combo.getSelectedItem();
-                    if (selected != null && selected.getId() > 0) {
-                        value = String.valueOf(selected.getId());
-                    } else {
-                        showError("Please select a valid " + colName);
-                        return;
+                JComponent comp = inputComponents[i - 1];
+                if (comp instanceof JTextField) {
+                    value = ((JTextField) comp).getText().trim();
+                } else if (comp instanceof JComboBox) {
+                    Object selectedItem = ((JComboBox<?>) comp).getSelectedItem();
+                    if (selectedItem instanceof ForeignKeyItem) {
+                        value = String.valueOf(((ForeignKeyItem) selectedItem).getId());
+                    } else if (selectedItem != null) {
+                        value = selectedItem.toString();
                     }
                 }
-
-                // Skip auto-increment IDs
-                if (value.equals("AUTO") && i == 1) {
-                    continue;
-                }
-
-                if (cols.length() > 0) {
-                    cols.append(", ");
-                    vals.append(", ");
-                }
-                cols.append(colName);
-                vals.append("'").append(value.replace("'", "''")).append("'");
+                valuesArray.add(value);
             }
-
-            String sql = "INSERT INTO " + tableName + " (" + cols + ") VALUES (" + vals + ")";
-            Connection conn = businessLayer.getDataLayer().getConnection();
-            Statement stmt = conn.createStatement();
-            stmt.executeUpdate(sql);
-
-            showSuccess("Record created successfully!");
-            loadTableData(tableName, model);
+            
+            boolean success = businessLayer.addUser(valuesArray.get(1), valuesArray.get(2), valuesArray.get(3),
+                    valuesArray.get(4), valuesArray.get(5), valuesArray.get(6));
+            
+            if (success) {
+                showSuccess("Record created successfully!");
+                loadTableData("USERS", model, true, currentUser.getUserId());
+            } else {
+                showError("Failed to create record.");
+            }
         } catch (Exception ex) {
             showError("Error creating record: " + ex.getMessage());
-        }
-    }
-
-    private void showUpdateDialog(String tableName, DefaultTableModel model,
-            JTable table, int row) {
-        try {
-            ResultSet rs = businessLayer.viewTable(tableName);
-            if (rs != null) {
-                ResultSetMetaData meta = rs.getMetaData();
-                int colCount = meta.getColumnCount();
-
-                JPanel panel = new JPanel(new GridLayout(colCount, 2, 5, 5));
-                JComponent[] inputComponents = new JComponent[colCount];
-
-                for (int i = 0; i < colCount; i++) {
-                    String colName = meta.getColumnName(i + 1);
-                    Object value = model.getValueAt(row, i);
-
-                    panel.add(new JLabel(colName + ":"));
-
-                    // Check if this is a primary key (first column)
-                    if (colName.toLowerCase().endsWith("_id") && i == 0) {
-                        JTextField field = new JTextField(value != null ? value.toString() : "", 20);
-                        field.setEnabled(false);
-                        inputComponents[i] = field;
-                        panel.add(field);
-                    }
-                    // Check if this is a foreign key
-                    else if (colName.toLowerCase().endsWith("_id")) {
-                        String[] fkInfo = getForeignKeyInfo(tableName, colName);
-                        if (fkInfo != null) {
-                            JComboBox<ForeignKeyItem> combo = createForeignKeyDropdown(
-                                    fkInfo[0], fkInfo[1], fkInfo[2]);
-                            // Pre-select the current value
-                            if (value != null) {
-                                int currentId = Integer.parseInt(value.toString());
-                                for (int j = 0; j < combo.getItemCount(); j++) {
-                                    ForeignKeyItem item = combo.getItemAt(j);
-                                    if (item.getId() == currentId) {
-                                        combo.setSelectedIndex(j);
-                                        break;
-                                    }
-                                }
-                            }
-                            inputComponents[i] = combo;
-                            panel.add(combo);
-                        } else {
-                            JTextField field = new JTextField(value != null ? value.toString() : "", 20);
-                            inputComponents[i] = field;
-                            panel.add(field);
-                        }
-                    }
-                    // Regular field
-                    else {
-                        JTextField field = new JTextField(value != null ? value.toString() : "", 20);
-                        inputComponents[i] = field;
-                        panel.add(field);
-                    }
-                }
-
-                int result = JOptionPane.showConfirmDialog(this, panel,
-                        "Update Record in " + tableName, JOptionPane.OK_CANCEL_OPTION);
-
-                if (result == JOptionPane.OK_OPTION) {
-                    updateRecord(tableName, meta, inputComponents, model, row);
-                }
-            }
-        } catch (Exception ex) {
-            showError("Error opening update dialog: " + ex.getMessage());
-        }
-    }
-
-    private void updateRecord(String tableName, ResultSetMetaData meta,
-            JComponent[] inputComponents, DefaultTableModel model, int row) {
-        try {
-            StringBuilder sets = new StringBuilder();
-            String idCol = meta.getColumnName(1);
-            String idVal = "";
-
-            // Get ID value from first component
-            JComponent firstComponent = inputComponents[0];
-            if (firstComponent instanceof JTextField) {
-                idVal = ((JTextField) firstComponent).getText();
-            }
-
-            int colCount = meta.getColumnCount();
-            for (int i = 2; i <= colCount; i++) {
-                String colName = meta.getColumnName(i);
-                String value = "";
-
-                // Get value from the appropriate component type
-                JComponent component = inputComponents[i - 1];
-                if (component instanceof JTextField) {
-                    value = ((JTextField) component).getText();
-                } else if (component instanceof JComboBox) {
-                    @SuppressWarnings("unchecked")
-                    JComboBox<ForeignKeyItem> combo = (JComboBox<ForeignKeyItem>) component;
-                    ForeignKeyItem selected = (ForeignKeyItem) combo.getSelectedItem();
-                    if (selected != null && selected.getId() > 0) {
-                        value = String.valueOf(selected.getId());
-                    } else {
-                        showError("Please select a valid " + colName);
-                        return;
-                    }
-                }
-
-                if (sets.length() > 0) {
-                    sets.append(", ");
-                }
-                sets.append(colName).append(" = '");
-                sets.append(value.replace("'", "''")).append("'");
-            }
-
-            String sql = "UPDATE " + tableName + " SET " + sets + " WHERE " + idCol + " = " + idVal;
-            Connection conn = businessLayer.getDataLayer().getConnection();
-            Statement stmt = conn.createStatement();
-            stmt.executeUpdate(sql);
-
-            showSuccess("Record updated successfully!");
-            loadTableData(tableName, model);
-        } catch (Exception ex) {
-            showError("Error updating record: " + ex.getMessage());
-        }
-    }
-
-    private void deleteRecord(String tableName, DefaultTableModel model, JTable table, int row) {
-        try {
-            ResultSet rs = businessLayer.viewTable(tableName);
-            if (rs != null) {
-                ResultSetMetaData meta = rs.getMetaData();
-                String idCol = meta.getColumnName(1);
-                Object idVal = model.getValueAt(row, 0);
-
-                int confirm = JOptionPane.showConfirmDialog(this,
-                        "Are you sure you want to delete this record?\nID: " + idVal,
-                        "Confirm Delete", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-
-                if (confirm == JOptionPane.YES_OPTION) {
-                    String sql = "DELETE FROM " + tableName + " WHERE " + idCol + " = " + idVal;
-                    Connection conn = businessLayer.getDataLayer().getConnection();
-                    Statement stmt = conn.createStatement();
-                    stmt.executeUpdate(sql);
-
-                    showSuccess("Record deleted successfully!");
-                    loadTableData(tableName, model);
-                }
-            }
-        } catch (Exception ex) {
-            showError("Error deleting record: " + ex.getMessage());
         }
     }
 

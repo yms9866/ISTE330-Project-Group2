@@ -5,6 +5,7 @@ Date: 11/17/2025
 */
 
 import java.sql.*;
+import java.awt.List;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -73,16 +74,20 @@ public class Group2DL {
     }
 
     /** * Display table using stored procedure */
-    public ResultSet displayTable(String tableName) {
+    public ResultSet displayTable(String tableName, boolean fullAccess, int userId) {
         if (!isConnected) {
-            System.err.println("Not connected to database");
             return null;
         }
         try {
             String call = "{CALL sp_display_table(?)}";
             CallableStatement cstmt = connection.prepareCall(call);
             cstmt.setString(1, tableName);
-            return cstmt.executeQuery();
+            if (fullAccess) {
+                
+                return cstmt.executeQuery();
+            } else {
+                return getUserSpecificData(tableName, userId);
+            }
         } catch (SQLException e) {
             System.err.println("Error displaying table: " + e.getMessage());
             return null;
@@ -138,61 +143,93 @@ public class Group2DL {
     }
 
     public boolean addUser(User user, String password) {
-        if (!isConnected)
+        if (!isConnected || user == null || password == null || password.trim().isEmpty()) {
             return false;
+        }
 
         String hashedPassword = hashPassword(password);
-        if (hashedPassword == null)
+        if (hashedPassword == null) {
             return false;
+        }
 
-        String insertUser = "INSERT INTO USERS (username, password_hash, full_name, email, phone, role) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO USERS (username, password_hash, full_name, email, phone, role, is_active) " +
+                      "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try {
+        try (PreparedStatement pstmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             connection.setAutoCommit(false);
+            pstmt.setString(1, user.getUsername());
+            pstmt.setString(2, hashedPassword);
+            pstmt.setString(3, user.getFullName());
+            pstmt.setString(4, user.getEmail());
+            pstmt.setString(5, user.getPhone());
+            pstmt.setString(6, user.getRole());
+            pstmt.setBoolean(7, user.isActive());
 
-            try (PreparedStatement pstmt = connection.prepareStatement(insertUser, Statement.RETURN_GENERATED_KEYS)) {
-                pstmt.setString(1, user.getUsername());
-                pstmt.setString(2, hashedPassword);
-                pstmt.setString(3, user.getFullName());
-                pstmt.setString(4, user.getEmail());
-                pstmt.setString(5, user.getPhone());
-                pstmt.setString(6, user.getRole());
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                connection.rollback();
+                return false;
+            }
 
-                int affectedRows = pstmt.executeUpdate();
-                if (affectedRows == 0) {
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    user.setUserId(generatedKeys.getInt(1));
+                    connection.commit();
+                    return true;
+                } else {
                     connection.rollback();
                     return false;
                 }
-
-                if ("Student".equals(user.getRole())) {
-                    ResultSet generatedKeys = pstmt.getGeneratedKeys();
-                    if (generatedKeys.next()) {
-                        int userId = generatedKeys.getInt(1);
-                        user.setUserId(userId);
-                        String insertAccount = "INSERT INTO ACCOUNTS (user_id, balance) VALUES (?, 0.00)";
-                        try (PreparedStatement accStmt = connection.prepareStatement(insertAccount)) {
-                            accStmt.setInt(1, userId);
-                            accStmt.executeUpdate();
-                        }
-                    }
-                }
             }
-
-            connection.commit();
-            connection.setAutoCommit(true);
-            return true;
-
         } catch (SQLException e) {
             try {
                 connection.rollback();
-                connection.setAutoCommit(true);
             } catch (SQLException ex) {
                 System.err.println("Rollback error: " + ex.getMessage());
             }
             System.err.println("Error adding user: " + e.getMessage());
             return false;
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                System.err.println("Error resetting auto-commit: " + e.getMessage());
+            }
         }
+    }
+    
+
+    public ArrayList<Transaction> getUserTransactionHistory(int userId) {
+        ArrayList<Transaction> transactions = new ArrayList<>();
+        
+        if (!isConnected || userId <= 0) {
+            return transactions;
+        }
+        
+        String query = "SELECT t.transaction_id, t.recieverid, t.senderid, t.amount, t.transaction_date" +
+                      " FROM TRANSACTIONS t " +
+                      "INNER JOIN USERS u ON t.senderid = u.user_id " +
+                      "WHERE u.user_id = ? " +
+                "ORDER BY t.transaction_date DESC";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                Transaction transaction = new Transaction();
+                transaction.setTransactionId(rs.getInt("transaction_id"));
+                transaction.setRecieverid(rs.getInt("recieverid"));
+                transaction.setSenderid(rs.getInt("senderid"));
+                transaction.setAmount(rs.getDouble("amount"));
+                transaction.setTransactionDate(rs.getTimestamp("transaction_date"));
+                
+                transactions.add(transaction);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving transaction history: " + e.getMessage());
+        }
+        
+        return transactions;
     }
 
     public String transferCredits(int sourceUserId, int destUserId, double amount) {
@@ -201,18 +238,60 @@ public class Group2DL {
 
         String call = "{CALL sp_transfer_credits(?, ?, ?, ?)}";
         try (CallableStatement cstmt = connection.prepareCall(call)) {
+            connection.setAutoCommit(false);
+            
+            // Execute the transfer
             cstmt.setInt(1, sourceUserId);
             cstmt.setInt(2, destUserId);
             cstmt.setDouble(3, amount);
             cstmt.registerOutParameter(4, Types.VARCHAR);
-
             cstmt.execute();
-            return cstmt.getString(4);
+            
+            String result = cstmt.getString(4);
+            
+            // If transfer was successful, record the transaction
+            if (result.startsWith("SUCCESS")) {
+                try {
+                    
+                    // Record the transaction
+                    String transactionSql = "INSERT INTO TRANSACTIONS (senderid, recieverid, amount, transaction_date) " +
+                                          "VALUES (?, ?, ?, NOW())";
+                                          
+                    try (PreparedStatement pstmt = connection.prepareStatement(transactionSql)) {
+                        pstmt.setInt(1, sourceUserId);  
+                        pstmt.setInt(2, destUserId);   
+                        pstmt.setDouble(3, amount);
+                        pstmt.executeUpdate();
+                    }
+                    
+                    connection.commit();
+                } catch (SQLException e) {
+                    connection.rollback();
+                    return "ERROR: Transaction could not be recorded: " + e.getMessage();
+                }
+            } else {
+                connection.rollback();
+            }
+            
+            return result;
 
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                return "ERROR: " + e.getMessage() + " (Rollback failed: " + ex.getMessage() + ")";
+            }
             return "ERROR: " + e.getMessage();
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                System.err.println("Error resetting auto-commit: " + e.getMessage());
+            }
         }
     }
+
+    
 
     public double getAccountBalance(int userId) {
         if (!isConnected)
@@ -473,46 +552,6 @@ public class Group2DL {
         return null;
     }
 
-    public String registerForRoute(int studentId, int routeId) {
-        if (!isConnected)
-            return "ERROR: Not connected to database";
-
-        String call = "{CALL sp_register_for_route(?, ?, ?)}";
-        try (CallableStatement cstmt = connection.prepareCall(call)) {
-            cstmt.setInt(1, studentId);
-            cstmt.setInt(2, routeId);
-            cstmt.registerOutParameter(3, Types.VARCHAR);
-
-            cstmt.execute();
-            return cstmt.getString(3);
-
-        } catch (SQLException e) {
-            return "ERROR: " + e.getMessage();
-        }
-    }
-
-    public String updateShuttleLocation(int shuttleId, double latitude, double longitude, double speedKmh,
-            int heading) {
-        if (!isConnected)
-            return "ERROR: Not connected to database";
-
-        String call = "{CALL sp_update_shuttle_location(?, ?, ?, ?, ?, ?)}";
-        try (CallableStatement cstmt = connection.prepareCall(call)) {
-            cstmt.setInt(1, shuttleId);
-            cstmt.setDouble(2, latitude);
-            cstmt.setDouble(3, longitude);
-            cstmt.setDouble(4, speedKmh);
-            cstmt.setInt(5, heading);
-            cstmt.registerOutParameter(6, Types.VARCHAR);
-
-            cstmt.execute();
-            return cstmt.getString(6);
-
-        } catch (SQLException e) {
-            return "ERROR: " + e.getMessage();
-        }
-    }
-
     public String getRouteCodeById(int routeId) {
         if (!isConnected)
             return null;
@@ -546,6 +585,7 @@ public class Group2DL {
         }
         return null;
     }
+
     public String getShuttleNumberById(int shuttleId) {
         if (!isConnected)
             return null;
@@ -559,6 +599,136 @@ public class Group2DL {
             }
         } catch (SQLException e) {
             System.err.println("Error getting shuttle number: " + e.getMessage());
+        }
+        return null;
+    }
+    
+    public ResultSet getUserSpecificData(String tableName, int userId) {
+        if (!isConnected) {
+            return null;
+        }
+        try {
+            StringBuilder routIds = new StringBuilder();
+            Shuttle shuttle = getDriverShuttleObject(userId);
+            if (shuttle == null) {
+                return null;
+            }
+            String query0 = "SELECT r.* FROM ROUTE r " +
+                    "INNER JOIN SHUTTLE_SCHEDULE ss ON r.route_id = ss.route_id " +
+                    "WHERE ss.shuttle_id = ? GROUP BY r.route_id";
+            PreparedStatement pstmt0 = connection.prepareStatement(query0);
+            pstmt0.setInt(1, shuttle.getShuttleId());
+            ResultSet re0 = pstmt0.executeQuery();
+            while (re0.next()) {
+                routIds.append(re0.getInt("route_id")).append(",");
+            }
+            //  rmove last comma
+            if (routIds.length() > 0) {
+                routIds.setLength(routIds.length() - 1);
+            } else {
+                return null;
+            }
+
+            if (tableName.equals("SHUTTLE")) {
+                String query = "SELECT * FROM SHUTTLE WHERE shuttle_id = ?";
+                PreparedStatement pstmt = connection.prepareStatement(query);
+                pstmt.setInt(1, shuttle.getShuttleId());
+                return pstmt.executeQuery();
+            } else if (tableName.equals("SHUTTLE_LOCATION")) {
+                String query = "SELECT * FROM SHUTTLE_LOCATION WHERE shuttle_id = ?";
+                PreparedStatement pstmt = connection.prepareStatement(query);
+                pstmt.setInt(1, shuttle.getShuttleId());
+                return pstmt.executeQuery();
+            } else if (tableName.equals("SHUTTLE_SCHEDULE")) {
+                String query = "SELECT * FROM SHUTTLE_SCHEDULE WHERE shuttle_id = ?";
+                PreparedStatement pstmt = connection.prepareStatement(query);
+                pstmt.setInt(1, shuttle.getShuttleId());
+                return pstmt.executeQuery();
+            } else if (tableName.equals("ROUTE")) {
+                String query = "SELECT r.* FROM ROUTE r " +
+                        "INNER JOIN SHUTTLE_SCHEDULE ss ON r.route_id = ss.route_id " +
+                        "WHERE ss.shuttle_id = ? GROUP BY r.route_id";
+                PreparedStatement pstmt = connection.prepareStatement(query);
+                pstmt.setInt(1, shuttle.getShuttleId());
+                ResultSet re = pstmt.executeQuery();
+                return re;
+            } else if (tableName.equals("STOP")) {
+                String query = "SELECT s.* FROM STOP s " +
+                        "INNER JOIN ROUTE r ON s.route_id = r.route_id Where s.route_id in (" + routIds.toString()
+                        + ") ORDER BY s.route_id, s.stop_order";
+                PreparedStatement pstmt = connection.prepareStatement(query);
+                pstmt.setInt(1, shuttle.getShuttleId());
+                return pstmt.executeQuery();
+            } else if (tableName.equals("STUDENT_ROUTE_REGISTRATION")) {
+                String query = "SELECT srr.* FROM STUDENT_ROUTE_REGISTRATION srr " +
+                        "INNER JOIN ROUTE r ON srr.route_id = r.route_id " +
+                        "INNER JOIN SHUTTLE_SCHEDULE ss ON r.route_id = ss.route_id " +
+                        "WHERE ss.shuttle_id = ? ORDER BY srr.registration_date DESC";
+                PreparedStatement pstmt = connection.prepareStatement(query);
+                pstmt.setInt(1, shuttle.getShuttleId());
+                return pstmt.executeQuery();
+            } else if (tableName.equals("ACCOUNT")) {
+                String query = "SELECT a.* FROM ACCOUNTS a " +
+                        "INNER JOIN USERS u ON a.user_id = u.user_id " +
+                        "INNER JOIN STUDENT_ROUTE_REGISTRATION srr ON u.user_id = srr.student_id " +
+                        "INNER JOIN ROUTE r ON srr.route_id = r.route_id " +
+                        "INNER JOIN SHUTTLE_SCHEDULE ss ON r.route_id = ss.route_id " +
+                        "WHERE ss.shuttle_id = ? GROUP BY a.account_id";
+                PreparedStatement pstmt = connection.prepareStatement(query);
+                pstmt.setInt(1, shuttle.getShuttleId());
+                return pstmt.executeQuery();
+            }
+
+            else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving user-specific data: " + e.getMessage());
+            return null;
+        }
+
+    }
+
+    public String getUserNameById(int userId) {
+        if (!isConnected)
+            return null;
+
+        String query = "SELECT full_name FROM USERS WHERE user_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("full_name");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting user name: " + e.getMessage());
+        }
+        return null;
+    }
+    
+    public User getUserById(int userId) {
+        if (!isConnected)
+            return null;
+
+        String query = "SELECT user_id, username, full_name, email, phone, role, created_at, is_active " +
+                "FROM USERS WHERE user_id = ?";
+        try (PreparedStatement pstmt = connection.prepareStatement(query)) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setFullName(rs.getString("full_name"));
+                user.setEmail(rs.getString("email"));
+                user.setPhone(rs.getString("phone"));
+                user.setRole(rs.getString("role"));
+                user.setCreatedAt(rs.getTimestamp("created_at"));
+                user.setActive(rs.getBoolean("is_active"));
+                return user;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting user by ID: " + e.getMessage());
         }
         return null;
     }
