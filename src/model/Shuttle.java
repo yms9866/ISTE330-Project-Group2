@@ -1,7 +1,7 @@
 /*
 Group 2
 Members: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi
-Date: 11/18/2025
+Date: 11/23/2025
 */
 package model;
 
@@ -26,8 +26,8 @@ public class Shuttle {
     }
 
     // Constructor with all fields
-    public Shuttle(int shuttleId, String shuttleNumber, String licensePlate, 
-                   int capacity, Integer driverId, String status, Timestamp createdAt) {
+    public Shuttle(int shuttleId, String shuttleNumber, String licensePlate,
+            int capacity, Integer driverId, String status, Timestamp createdAt) {
         this.shuttleId = shuttleId;
         this.shuttleNumber = shuttleNumber;
         this.licensePlate = licensePlate;

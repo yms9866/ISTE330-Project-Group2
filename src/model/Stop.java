@@ -1,7 +1,7 @@
 /*
 Group 2
 Members: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi
-Date: 11/18/2025
+Date: 11/23/2025
 */
 
 package model;
@@ -27,8 +27,8 @@ public class Stop {
     }
 
     // Constructor with all fields
-    public Stop(int stopId, int routeId, String stopName, int stopOrder, 
-                BigDecimal latitude, BigDecimal longitude, Time estimatedArrivalTime) {
+    public Stop(int stopId, int routeId, String stopName, int stopOrder,
+            BigDecimal latitude, BigDecimal longitude, Time estimatedArrivalTime) {
         this.stopId = stopId;
         this.routeId = routeId;
         this.stopName = stopName;
@@ -39,8 +39,8 @@ public class Stop {
     }
 
     // Constructor without stopId (for new stops)
-    public Stop(int routeId, String stopName, int stopOrder, 
-                BigDecimal latitude, BigDecimal longitude, Time estimatedArrivalTime) {
+    public Stop(int routeId, String stopName, int stopOrder,
+            BigDecimal latitude, BigDecimal longitude, Time estimatedArrivalTime) {
         this.routeId = routeId;
         this.stopName = stopName;
         this.stopOrder = stopOrder;

@@ -1,7 +1,7 @@
 /*
 Group 2
 Members: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi
-Date: 11/18/2025
+Date: 11/23/2025
 */
 
 package model;
@@ -28,9 +28,9 @@ public class ShuttleLocation {
     }
 
     // Constructor with all fields
-    public ShuttleLocation(int locationId, int shuttleId, BigDecimal latitude, 
-                          BigDecimal longitude, BigDecimal speedKmh, 
-                          Integer heading, Timestamp timestamp) {
+    public ShuttleLocation(int locationId, int shuttleId, BigDecimal latitude,
+            BigDecimal longitude, BigDecimal speedKmh,
+            Integer heading, Timestamp timestamp) {
         this.locationId = locationId;
         this.shuttleId = shuttleId;
         this.latitude = latitude;
@@ -41,8 +41,8 @@ public class ShuttleLocation {
     }
 
     // Constructor without locationId (for new location updates)
-    public ShuttleLocation(int shuttleId, BigDecimal latitude, BigDecimal longitude, 
-                          BigDecimal speedKmh, Integer heading) {
+    public ShuttleLocation(int shuttleId, BigDecimal latitude, BigDecimal longitude,
+            BigDecimal speedKmh, Integer heading) {
         this.shuttleId = shuttleId;
         this.latitude = latitude;
         this.longitude = longitude;

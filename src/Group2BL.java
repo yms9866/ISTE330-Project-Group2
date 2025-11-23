@@ -1,7 +1,7 @@
 /*
 Group 2
 Members: Yosef Shibele, Syed Zain, Ismail Mohammed Habibi
-Date: 11/17/2025
+Date: 11/23/2025
 */
 
 import java.sql.ResultSet;
@@ -31,14 +31,15 @@ public class Group2BL {
     public boolean isConnected() {
         return dataLayer.isConnected();
     }
+
     private boolean isValidTableName(String tableName) {
         String regex = "^[a-zA-Z0-9_]+$";
         return tableName != null && tableName.matches(regex);
     }
 
-    public ResultSet viewTable(String tableName, boolean fullAccess, int userId) { //\ Validate table name (prevent SQL injection) 
-        if (!isValidTableName(tableName)) 
-        {
+    public ResultSet viewTable(String tableName, boolean fullAccess, int userId) { // \ Validate table name (prevent SQL
+                                                                                   // injection)
+        if (!isValidTableName(tableName)) {
             System.err.println("ERROR: Invalid table name");
             return null;
         }
@@ -73,8 +74,6 @@ public class Group2BL {
         return dataLayer.getUserSpecificData(tableName, userId);
     }
 
-
-
     public String transferCredits(int sourceUserId, int destUserId, double amount) {
         if (amount <= 0)
             return "ERROR: Transfer amount must be greater than zero";
@@ -95,8 +94,6 @@ public class Group2BL {
     public double viewAccountBalance(int userId) {
         return dataLayer.getAccountBalance(userId);
     }
-
-   
 
     public ArrayList<Route> viewAvailableRoutes() {
         return dataLayer.getAllRoutes();
@@ -141,11 +138,10 @@ public class Group2BL {
     public String getRouteNameById(int routeId) {
         return dataLayer.getRouteNameById(routeId);
     }
-    
+
     public String getShuttleNumberById(int shuttleId) {
         return dataLayer.getShuttleNumberById(shuttleId);
     }
-
 
     private boolean validateUserInputs(String username, String password,
             String fullName, String email) {
@@ -212,9 +208,11 @@ public class Group2BL {
     public String getUserNameById(int userId) {
         return dataLayer.getUserNameById(userId);
     }
+
     public User getUserById(int userId) {
         return dataLayer.getUserById(userId);
     }
+
     public String hashPassword(String password) {
         return dataLayer.hashPassword(password);
     }
